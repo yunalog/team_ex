@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>방치형 RPG 프로토타입</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="phone-game">
+    <section class="top-hud">
+      <div class="hud-card">
+        <span class="label">CHAPTER</span>
+        <strong id="chapterText">1</strong>
+      </div>
+      <div class="hud-card wide">
+        <span class="label">STAGE</span>
+        <strong id="stageText">1-1</strong>
+      </div>
+      <div class="hud-card">
+        <span class="label">GOLD</span>
+        <strong id="goldText">0</strong>
+      </div>
+    </section>
+
+    <section class="battle-header">
+      <div>
+        <p id="stageTypeText" class="stage-type">일반 스테이지</p>
+        <h1 id="stageTitle">숲 입구</h1>
+      </div>
+      <div id="timerBox" class="timer hidden">
+        <span>남은 시간</span>
+        <strong id="bossTimerText">30.0</strong>
+      </div>
+    </section>
+
+    <section class="battle-field" id="battleField">
+      <div class="monster-layer" id="monsterLayer"></div>
+
+      <div class="hero-wrap" id="heroWrap">
+        <div class="hero-shadow"></div>
+        <div class="hero" id="hero">
+          <div class="hero-face">⚔️</div>
+        </div>
+        <div class="hero-name">용사</div>
+      </div>
+
+      <div class="damage-layer" id="damageLayer"></div>
+    </section>
+
+    <section class="progress-panel">
+      <div class="progress-top">
+        <span id="goalText">몬스터 0 / 0</span>
+        <span id="powerText">전투력 10</span>
+      </div>
+      <div class="progress-bar">
+        <div id="progressFill"></div>
+      </div>
+    </section>
+
+    <section class="bottom-panel">
+      <div class="stat-grid">
+        <div>
+          <span>LV</span>
+          <strong id="levelText">1</strong>
+        </div>
+        <div>
+          <span>EXP</span>
+          <strong id="expText">0 / 20</strong>
+        </div>
+        <div>
+          <span>ATK</span>
+          <strong id="atkText">10</strong>
+        </div>
+      </div>
+
+      <div class="upgrade-row">
+        <button id="atkUpgradeBtn">
+          공격력 강화
+          <small id="atkCostText">비용 20G</small>
+        </button>
+        <button id="speedUpgradeBtn">
+          공격속도 강화
+          <small id="speedCostText">비용 30G</small>
+        </button>
+      </div>
+    </section>
+
+    <div id="toast" class="toast hidden"></div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
