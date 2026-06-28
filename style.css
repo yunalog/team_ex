@@ -3,6 +3,13 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+:root {
+  --panel: rgba(15, 23, 42, 0.52);
+  --panel-border: rgba(255, 255, 255, 0.28);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 html,
 body {
   width: 100%;
@@ -22,31 +29,34 @@ button {
 
 .phone-game {
   width: 100vw;
+  height: 100vh;
   height: 100dvh;
-  max-width: 480px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
+  min-height: 100svh;
+  margin: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(circle at 50% 18%, rgba(130, 208, 255, 0.35), transparent 28%),
+    radial-gradient(circle at 50% 13%, rgba(130, 208, 255, 0.42), transparent 28%),
+    radial-gradient(circle at 13% 42%, rgba(255, 255, 255, 0.16), transparent 24%),
+    radial-gradient(circle at 88% 50%, rgba(255, 255, 255, 0.12), transparent 22%),
     linear-gradient(180deg, #87d4ff 0%, #8de6be 46%, #53b06f 100%);
 }
 
 .top-hud {
   display: grid;
-  grid-template-columns: 1fr 1.25fr 1fr;
-  gap: 8px;
-  padding: max(12px, env(safe-area-inset-top)) 12px 8px;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: clamp(6px, 1.2vw, 14px);
+  padding: calc(10px + var(--safe-top)) clamp(10px, 2vw, 28px) 8px;
   z-index: 5;
 }
 
 .hud-card {
-  min-height: 56px;
-  padding: 8px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 18px;
+  min-height: clamp(48px, 7.2vh, 72px);
+  padding: clamp(8px, 1.4vw, 14px) clamp(10px, 1.8vw, 18px);
+  border: 1px solid var(--panel-border);
+  border-radius: clamp(16px, 2vw, 24px);
   background: rgba(15, 23, 42, 0.42);
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
   backdrop-filter: blur(10px);
@@ -59,14 +69,14 @@ button {
 .stage-type,
 .timer span,
 .stat-grid span {
-  font-size: 10px;
+  font-size: clamp(9px, 1.2vw, 12px);
   font-weight: 800;
   letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .hud-card strong {
-  font-size: 18px;
+  font-size: clamp(17px, 2.6vw, 28px);
   line-height: 1.1;
 }
 
@@ -75,7 +85,7 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 0 16px 8px;
+  padding: 0 clamp(12px, 2vw, 28px) 8px;
   z-index: 5;
 }
 
@@ -85,14 +95,14 @@ button {
 
 h1 {
   margin: 0;
-  font-size: 22px;
+  font-size: clamp(21px, 3.2vw, 38px);
   text-shadow: 0 2px 8px rgba(15, 23, 42, 0.28);
 }
 
 .timer {
-  min-width: 78px;
-  padding: 8px 10px;
-  border-radius: 16px;
+  min-width: clamp(78px, 12vw, 130px);
+  padding: clamp(8px, 1.2vw, 14px) clamp(10px, 1.5vw, 18px);
+  border-radius: clamp(16px, 2vw, 24px);
   text-align: center;
   background: rgba(239, 68, 68, 0.88);
   box-shadow: 0 8px 20px rgba(127, 29, 29, 0.22);
@@ -100,14 +110,14 @@ h1 {
 
 .timer strong {
   display: block;
-  font-size: 20px;
+  font-size: clamp(20px, 3vw, 34px);
 }
 
 .battle-field {
-  flex: 1;
+  min-height: 0;
   position: relative;
-  margin: 0 12px;
-  border-radius: 28px;
+  margin: 0 clamp(10px, 2vw, 28px);
+  border-radius: clamp(24px, 3vw, 40px);
   overflow: hidden;
   background:
     radial-gradient(circle at 50% 68%, rgba(255, 255, 255, 0.28), transparent 26%),
@@ -125,17 +135,17 @@ h1 {
 }
 
 .battle-field::before {
-  width: 120px;
-  height: 34px;
-  top: 44px;
-  left: 22px;
+  width: clamp(90px, 15vw, 190px);
+  height: clamp(28px, 4vw, 50px);
+  top: 8%;
+  left: 6%;
 }
 
 .battle-field::after {
-  width: 90px;
-  height: 28px;
-  top: 78px;
-  right: 26px;
+  width: clamp(80px, 12vw, 150px);
+  height: clamp(24px, 3vw, 42px);
+  top: 15%;
+  right: 8%;
 }
 
 .monster-layer,
@@ -146,8 +156,8 @@ h1 {
 
 .monster {
   position: absolute;
-  width: 58px;
-  height: 58px;
+  width: clamp(52px, 8vw, 86px);
+  height: clamp(52px, 8vw, 86px);
   transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
@@ -156,8 +166,8 @@ h1 {
 }
 
 .monster.target .monster-body {
-  outline: 3px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.32), 0 12px 24px rgba(15, 23, 42, 0.25);
+  outline: clamp(2px, 0.45vw, 4px) solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 clamp(5px, 1vw, 10px) rgba(251, 191, 36, 0.32), 0 12px 24px rgba(15, 23, 42, 0.25);
 }
 
 .monster.hit {
@@ -170,26 +180,26 @@ h1 {
 }
 
 .monster-body {
-  width: 52px;
-  height: 52px;
+  width: clamp(48px, 7.2vw, 78px);
+  height: clamp(48px, 7.2vw, 78px);
   border-radius: 50% 50% 44% 44%;
   background: linear-gradient(160deg, #ff8964, #d946ef);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
+  font-size: clamp(24px, 4vw, 42px);
   box-shadow: 0 10px 16px rgba(15, 23, 42, 0.22);
 }
 
 .monster.boss {
-  width: 106px;
-  height: 106px;
+  width: clamp(96px, 15vw, 170px);
+  height: clamp(96px, 15vw, 170px);
 }
 
 .monster.boss .monster-body {
-  width: 96px;
-  height: 96px;
-  font-size: 44px;
+  width: clamp(88px, 14vw, 156px);
+  height: clamp(88px, 14vw, 156px);
+  font-size: clamp(42px, 7vw, 78px);
   background: linear-gradient(160deg, #7f1d1d, #111827);
 }
 
@@ -197,8 +207,8 @@ h1 {
   position: absolute;
   left: 50%;
   bottom: -8px;
-  width: 54px;
-  height: 7px;
+  width: 92%;
+  height: clamp(7px, 1vw, 10px);
   transform: translateX(-50%);
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.42);
@@ -206,8 +216,8 @@ h1 {
 }
 
 .monster.boss .monster-hp {
-  width: 98px;
-  height: 9px;
+  width: 92%;
+  height: clamp(9px, 1.2vw, 13px);
 }
 
 .monster-hp-fill {
@@ -220,8 +230,8 @@ h1 {
   position: absolute;
   left: 50%;
   top: 56%;
-  width: 96px;
-  height: 118px;
+  width: clamp(92px, 13vw, 148px);
+  height: clamp(112px, 16vw, 182px);
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
@@ -233,22 +243,22 @@ h1 {
 .hero-shadow {
   position: absolute;
   bottom: 12px;
-  width: 82px;
-  height: 22px;
+  width: 86%;
+  height: 18%;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.18);
 }
 
 .hero {
-  width: 82px;
-  height: 82px;
-  border-radius: 28px 28px 34px 34px;
+  width: clamp(78px, 11vw, 126px);
+  height: clamp(78px, 11vw, 126px);
+  border-radius: 30% 30% 38% 38%;
   background: linear-gradient(160deg, #fff7ed, #38bdf8 54%, #2563eb);
-  border: 4px solid rgba(255, 255, 255, 0.9);
+  border: clamp(3px, 0.6vw, 6px) solid rgba(255, 255, 255, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36px;
+  font-size: clamp(35px, 5.3vw, 62px);
   box-shadow: 0 14px 30px rgba(15, 23, 42, 0.25);
   animation: idle 1.2s ease-in-out infinite;
 }
@@ -261,17 +271,17 @@ h1 {
   margin-top: 5px;
   padding: 3px 9px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: clamp(12px, 1.5vw, 16px);
   font-weight: 900;
   background: rgba(15, 23, 42, 0.46);
 }
 
 .slash {
   position: absolute;
-  width: 48px;
-  height: 48px;
-  border-top: 5px solid rgba(255, 255, 255, 0.95);
-  border-right: 5px solid rgba(255, 255, 255, 0.95);
+  width: clamp(44px, 6vw, 76px);
+  height: clamp(44px, 6vw, 76px);
+  border-top: clamp(4px, 0.7vw, 8px) solid rgba(255, 255, 255, 0.95);
+  border-right: clamp(4px, 0.7vw, 8px) solid rgba(255, 255, 255, 0.95);
   border-radius: 12px;
   transform: rotate(34deg);
   opacity: 0;
@@ -282,7 +292,7 @@ h1 {
 .damage-text {
   position: absolute;
   font-weight: 1000;
-  font-size: 17px;
+  font-size: clamp(16px, 2.4vw, 28px);
   color: #fff;
   text-shadow: 0 2px 6px rgba(127, 29, 29, 0.8);
   transform: translate(-50%, -50%);
@@ -291,10 +301,10 @@ h1 {
 }
 
 .progress-panel {
-  margin: 10px 12px 0;
-  padding: 12px;
-  border-radius: 22px;
-  background: rgba(15, 23, 42, 0.5);
+  margin: clamp(8px, 1.4vh, 14px) clamp(10px, 2vw, 28px) 0;
+  padding: clamp(10px, 1.5vw, 16px);
+  border-radius: clamp(20px, 2.3vw, 28px);
+  background: var(--panel);
   backdrop-filter: blur(12px);
   z-index: 5;
 }
@@ -302,14 +312,15 @@ h1 {
 .progress-top {
   display: flex;
   justify-content: space-between;
+  gap: 12px;
   margin-bottom: 8px;
-  font-size: 13px;
+  font-size: clamp(13px, 1.7vw, 18px);
   font-weight: 900;
 }
 
 .progress-bar {
   width: 100%;
-  height: 12px;
+  height: clamp(11px, 1.6vw, 18px);
   border-radius: 999px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.18);
@@ -324,41 +335,42 @@ h1 {
 }
 
 .bottom-panel {
-  padding: 10px 12px calc(12px + env(safe-area-inset-bottom));
+  padding: clamp(8px, 1.2vh, 14px) clamp(10px, 2vw, 28px) calc(10px + var(--safe-bottom));
   z-index: 5;
 }
 
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: clamp(6px, 1.2vw, 12px);
+  margin-bottom: clamp(6px, 1vh, 10px);
 }
 
 .stat-grid div {
-  padding: 10px;
-  border-radius: 18px;
-  background: rgba(15, 23, 42, 0.5);
+  padding: clamp(9px, 1.5vw, 16px);
+  border-radius: clamp(17px, 2vw, 24px);
+  background: var(--panel);
   backdrop-filter: blur(12px);
 }
 
 .stat-grid strong {
   display: block;
   margin-top: 3px;
-  font-size: 16px;
+  font-size: clamp(16px, 2.2vw, 26px);
 }
 
 .upgrade-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: clamp(8px, 1.2vw, 14px);
 }
 
 .upgrade-row button {
-  min-height: 58px;
-  border-radius: 19px;
+  min-height: clamp(56px, 8vh, 80px);
+  border-radius: clamp(18px, 2vw, 26px);
   background: linear-gradient(180deg, #fff, #e0f2fe);
   color: #0f172a;
+  font-size: clamp(14px, 1.7vw, 19px);
   font-weight: 1000;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
 }
@@ -371,20 +383,22 @@ h1 {
   display: block;
   margin-top: 3px;
   color: #2563eb;
+  font-size: clamp(11px, 1.25vw, 15px);
 }
 
 .toast {
   position: absolute;
   left: 50%;
-  bottom: 142px;
+  bottom: calc(clamp(132px, 18vh, 190px) + var(--safe-bottom));
   transform: translateX(-50%);
   padding: 10px 14px;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.85);
   color: #fff;
-  font-size: 13px;
+  font-size: clamp(13px, 1.5vw, 16px);
   font-weight: 900;
   z-index: 10;
+  white-space: nowrap;
 }
 
 .hidden {
@@ -414,12 +428,84 @@ h1 {
   100% { opacity: 0; transform: translate(-50%, -120%) scale(1.05); }
 }
 
-@media (min-width: 481px) {
-  body {
-    background: #0f172a;
+@media (orientation: landscape) and (min-width: 760px) {
+  .phone-game {
+    grid-template-columns: minmax(280px, 24vw) minmax(0, 1fr) minmax(300px, 25vw);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: clamp(10px, 1.2vw, 18px);
+    padding: calc(14px + var(--safe-top)) clamp(14px, 1.5vw, 24px) calc(14px + var(--safe-bottom));
   }
 
-  .phone-game {
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 24px 80px rgba(0, 0, 0, 0.45);
+  .top-hud {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    grid-template-columns: 1fr;
+    align-content: start;
+    padding: 0;
   }
+
+  .battle-header {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 0;
+  }
+
+  .battle-field {
+    grid-column: 2;
+    grid-row: 2 / span 2;
+    margin: 0;
+  }
+
+  .progress-panel {
+    grid-column: 3;
+    grid-row: 1;
+    margin: 0;
+    align-self: start;
+  }
+
+  .bottom-panel {
+    grid-column: 3;
+    grid-row: 2 / span 2;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .stat-grid,
+  .upgrade-row {
+    grid-template-columns: 1fr;
+  }
+
+  .toast {
+    bottom: calc(28px + var(--safe-bottom));
+  }
+}
+
+@media (max-height: 680px) and (orientation: portrait) {
+  .hud-card {
+    min-height: 44px;
+  }
+
+  .battle-header {
+    padding-bottom: 6px;
+  }
+
+  .bottom-panel {
+    padding-top: 6px;
+  }
+
+  .upgrade-row button {
+    min-height: 50px;
+  }
+}
+
+.progress-bar div.boss-hp-fill {
+  background: linear-gradient(90deg, #ef4444, #f97316, #facc15);
+  transition: width 0.28s ease;
+}
+
+.damage-text.boss-damage {
+  font-size: clamp(18px, 3vw, 28px);
+  font-weight: 1000;
 }

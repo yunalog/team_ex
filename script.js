@@ -114,12 +114,13 @@ function createNormalMonsters() {
 }
 
 function createBoss() {
-  const stageNumber = getStageNumber();
-  const maxHp = Math.floor(260 + stageNumber * 70 + state.chapter * 130);
   state.killGoal = 1;
   state.bossTimeLimit = Math.max(18, 32 - state.chapter);
   state.bossTimeLeft = state.bossTimeLimit;
 
+  // 보스 HP는 숫자형 체력으로 관리한다.
+  // 공격 시 현재 전투력만큼 실제 피해가 들어가고, UI에는 현재HP / 최대HP (%)로 표시된다.
+  const maxHp = Math.floor(650 + state.chapter * 300 + getStageNumber() * 45);
   const boss = {
     id: crypto.randomUUID(),
     type: "boss",
@@ -232,7 +233,8 @@ function attackTarget(now) {
   if (!target) return;
 
   state.lastAttackAt = now;
-  const damage = Math.floor(state.atk * randomBetween(0.86, 1.18));
+  const rawDamage = Math.floor(state.atk * randomBetween(0.86, 1.18));
+  const damage = target.type === "boss" ? getPower() : rawDamage;
   target.hp = Math.max(0, target.hp - damage);
 
   playAttackAnimation(target, damage);
@@ -262,10 +264,10 @@ function playAttackAnimation(target, damage) {
   setTimeout(() => slash.remove(), 300);
 
   const damageText = document.createElement("div");
-  damageText.className = "damage-text";
+  damageText.className = `damage-text ${target.type === "boss" ? "boss-damage" : ""}`;
   damageText.style.left = `${target.x}%`;
   damageText.style.top = `${target.y - 5}%`;
-  damageText.textContent = `-${damage}`;
+  damageText.textContent = `-${formatNumber(damage)}`;
   els.damageLayer.appendChild(damageText);
   setTimeout(() => damageText.remove(), 700);
 }
@@ -312,9 +314,10 @@ function clearStage() {
 
 function failBossStage() {
   state.paused = true;
-  showToast("보스 실패! 공격력을 강화하고 재도전");
+  showToast("보스 실패! 이전 일반 스테이지로 복귀");
 
   setTimeout(() => {
+    state.stageInChapter = 4;
     state.paused = false;
     createStage();
   }, 1200);
@@ -368,11 +371,16 @@ function render() {
 
   if (state.stageType === "boss") {
     const boss = state.monsters[0];
-    els.goalText.textContent = boss ? `보스 HP ${Math.ceil(boss.hp)} / ${boss.maxHp}` : "보스 HP 0 / 0";
-    els.progressFill.style.width = boss ? `${100 - (boss.hp / boss.maxHp) * 100}%` : "100%";
+    const hpPercent = boss ? Math.ceil((boss.hp / boss.maxHp) * 100) : 0;
+    const bossHp = boss ? formatNumber(boss.hp) : 0;
+    const bossMaxHp = boss ? formatNumber(boss.maxHp) : 0;
+    els.goalText.textContent = `보스 HP ${bossHp} / ${bossMaxHp} (${hpPercent}%)`;
+    els.progressFill.style.width = `${hpPercent}%`;
+    els.progressFill.classList.add("boss-hp-fill");
   } else {
     els.goalText.textContent = `몬스터 ${state.killed} / ${state.killGoal}`;
     els.progressFill.style.width = `${(state.killed / state.killGoal) * 100}%`;
+    els.progressFill.classList.remove("boss-hp-fill");
   }
 
   els.powerText.textContent = `전투력 ${formatNumber(getPower())}`;
