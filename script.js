@@ -1,423 +1,456 @@
-const $ = (id) => document.getElementById(id);
+const STORAGE_KEY = "idleRpgTycoonPrototype";
 
-const state = {
-  chapter: 1,
-  stageInChapter: 1,
-  stageType: "normal",
+const defaultState = {
   gold: 0,
-  level: 1,
-  exp: 0,
-  expToNext: 20,
-  atk: 10,
-  attackInterval: 850,
-  atkCost: 20,
-  speedCost: 30,
-  monsters: [],
-  targetId: null,
-  killed: 0,
-  killGoal: 0,
-  bossTimeLimit: 30,
-  bossTimeLeft: 30,
-  lastAttackAt: 0,
-  lastTickAt: performance.now(),
-  paused: false,
+  stage: 1,
+  subStage: 1,
+  hp: 100,
+  maxHp: 100,
+  baseAtk: 10,
+  sound: true,
+  officeLevel: 1,
+  equipment: {
+    weapon: null,
+    armor: null,
+    accessory: null,
+  },
+  buffs: [],
+  companions: [],
+  squad: [],
+  lastSaveAt: Date.now(),
 };
 
-const stageNames = [
-  "푸른 버섯 숲",
-  "돌도끼 언덕",
-  "고대 들판",
-  "바람 협곡",
-  "잠든 화산",
+let state = loadState();
+
+let currentEnemy = null;
+let battleTimer = null;
+let bossTimeLeft = 0;
+let bossTimerInterval = null;
+
+const itemPool = [
+  { type: "weapon", typeName: "무기", name: "나무검", atk: 5, def: 0, hp: 0 },
+  { type: "weapon", typeName: "무기", name: "철검", atk: 14, def: 0, hp: 0 },
+  { type: "weapon", typeName: "무기", name: "용사의 검", atk: 30, def: 0, hp: 0 },
+  { type: "armor", typeName: "방어구", name: "천 갑옷", atk: 0, def: 3, hp: 20 },
+  { type: "armor", typeName: "방어구", name: "철 갑옷", atk: 0, def: 8, hp: 50 },
+  { type: "accessory", typeName: "장신구", name: "작은 반지", atk: 3, def: 1, hp: 10 },
+  { type: "accessory", typeName: "장신구", name: "빛나는 목걸이", atk: 8, def: 3, hp: 35 },
 ];
 
-const monsterIcons = ["🍄", "🐗", "🦇", "🪨", "🦖", "🐺"];
-const bossIcons = ["👹", "🐲", "🦣", "🧌", "🔥"];
+const buffPool = [
+  { type: "buff", typeName: "기간제 버프", name: "공격력 물약", atk: 15, duration: 60 },
+  { type: "buff", typeName: "기간제 버프", name: "체력 물약", hp: 50, duration: 60 },
+];
 
-const els = {
-  chapterText: $("chapterText"),
-  stageText: $("stageText"),
-  goldText: $("goldText"),
-  stageTypeText: $("stageTypeText"),
-  stageTitle: $("stageTitle"),
-  timerBox: $("timerBox"),
-  bossTimerText: $("bossTimerText"),
-  monsterLayer: $("monsterLayer"),
-  damageLayer: $("damageLayer"),
-  hero: $("hero"),
-  goalText: $("goalText"),
-  powerText: $("powerText"),
-  progressFill: $("progressFill"),
-  levelText: $("levelText"),
-  expText: $("expText"),
-  atkText: $("atkText"),
-  atkUpgradeBtn: $("atkUpgradeBtn"),
-  speedUpgradeBtn: $("speedUpgradeBtn"),
-  atkCostText: $("atkCostText"),
-  speedCostText: $("speedCostText"),
-  toast: $("toast"),
-};
+const companionPool = [
+  { name: "초보 기사", atk: 5, role: "딜러" },
+  { name: "숲의 궁수", atk: 8, role: "딜러" },
+  { name: "견습 힐러", atk: 3, role: "지원" },
+  { name: "광산 관리자", atk: 4, role: "타운" },
+];
+
+function loadState() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  return saved ? JSON.parse(saved) : structuredClone(defaultState);
+}
+
+function saveState() {
+  state.lastSaveAt = Date.now();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
 
 function getStageNumber() {
-  return (state.chapter - 1) * 5 + state.stageInChapter;
+  return `${state.stage}-${state.subStage}`;
 }
 
 function isBossStage() {
-  return state.stageInChapter === 5;
+  return state.subStage === 5;
 }
 
-function normalMonsterCount() {
-  return 4 + state.stageInChapter + Math.floor(state.chapter / 2);
+function getTotalAtk() {
+  let atk = state.baseAtk;
+
+  Object.values(state.equipment).forEach(item => {
+    if (item) atk += item.atk || 0;
+  });
+
+  state.buffs.forEach(buff => {
+    atk += buff.atk || 0;
+  });
+
+  state.squad.forEach(c => {
+    atk += c.atk || 0;
+  });
+
+  return atk;
 }
 
-function createStage() {
-  state.stageType = isBossStage() ? "boss" : "normal";
-  state.monsters = [];
-  state.targetId = null;
-  state.killed = 0;
-  state.lastAttackAt = 0;
-  els.monsterLayer.innerHTML = "";
-  els.damageLayer.innerHTML = "";
+function getMaxHp() {
+  let hp = state.maxHp;
 
-  if (state.stageType === "boss") {
-    createBoss();
-  } else {
-    createNormalMonsters();
-  }
+  Object.values(state.equipment).forEach(item => {
+    if (item) hp += item.hp || 0;
+  });
 
-  selectNextTarget();
-  render();
+  state.buffs.forEach(buff => {
+    hp += buff.hp || 0;
+  });
+
+  return hp;
 }
 
-function createNormalMonsters() {
-  const count = normalMonsterCount();
-  state.killGoal = count;
+function createEnemy() {
+  const stageValue = state.stage * 5 + state.subStage;
 
-  const positions = getMonsterPositions(count);
-  for (let i = 0; i < count; i += 1) {
-    const maxHp = Math.floor(22 + getStageNumber() * 7 + i * 3);
-    const monster = {
-      id: crypto.randomUUID(),
-      type: "normal",
-      icon: monsterIcons[(i + state.chapter + state.stageInChapter) % monsterIcons.length],
-      x: positions[i].x,
-      y: positions[i].y,
-      hp: maxHp,
-      maxHp,
-      gold: 5 + state.chapter * 2 + state.stageInChapter,
-      exp: 4 + state.stageInChapter,
-      alive: true,
+  if (isBossStage()) {
+    return {
+      name: `보스 거대 멧돼지 ${state.stage}`,
+      icon: "🐗",
+      maxHp: 180 + stageValue * 45,
+      hp: 180 + stageValue * 45,
+      atk: 8 + stageValue * 2,
+      reward: 80 + stageValue * 12,
+      isBoss: true,
     };
-    state.monsters.push(monster);
-    els.monsterLayer.appendChild(createMonsterElement(monster));
   }
-}
 
-function createBoss() {
-  state.killGoal = 1;
-  state.bossTimeLimit = Math.max(18, 32 - state.chapter);
-  state.bossTimeLeft = state.bossTimeLimit;
-
-  // 보스 HP는 숫자형 체력으로 관리한다.
-  // 공격 시 현재 전투력만큼 실제 피해가 들어가고, UI에는 현재HP / 최대HP (%)로 표시된다.
-  const maxHp = Math.floor(650 + state.chapter * 300 + getStageNumber() * 45);
-  const boss = {
-    id: crypto.randomUUID(),
-    type: "boss",
-    icon: bossIcons[(state.chapter - 1) % bossIcons.length],
-    x: 50,
-    y: 32,
-    hp: maxHp,
-    maxHp,
-    gold: 70 + state.chapter * 35,
-    exp: 28 + state.chapter * 12,
-    alive: true,
-  };
-
-  state.monsters.push(boss);
-  els.monsterLayer.appendChild(createMonsterElement(boss));
-}
-
-function getMonsterPositions(count) {
-  const base = [
-    { x: 25, y: 26 },
-    { x: 75, y: 27 },
-    { x: 18, y: 48 },
-    { x: 82, y: 49 },
-    { x: 32, y: 72 },
-    { x: 68, y: 72 },
-    { x: 50, y: 22 },
-    { x: 50, y: 78 },
-    { x: 13, y: 64 },
-    { x: 87, y: 64 },
+  const monsters = [
+    { name: "숲 늑대", icon: "🐺" },
+    { name: "슬라임", icon: "🟢" },
+    { name: "멧돼지", icon: "🐗" },
+    { name: "버섯 몬스터", icon: "🍄" },
   ];
 
-  return base.slice(0, count).map((pos, index) => ({
-    x: clamp(pos.x + randomBetween(-3, 3), 10, 90),
-    y: clamp(pos.y + randomBetween(-3, 3), 18, 80),
-    order: index,
-  }));
+  const pick = monsters[Math.floor(Math.random() * monsters.length)];
+
+  return {
+    name: pick.name,
+    icon: pick.icon,
+    maxHp: 40 + stageValue * 18,
+    hp: 40 + stageValue * 18,
+    atk: 4 + stageValue,
+    reward: 15 + stageValue * 4,
+    isBoss: false,
+  };
 }
 
-function createMonsterElement(monster) {
-  const el = document.createElement("div");
-  el.className = `monster ${monster.type === "boss" ? "boss" : ""}`;
-  el.dataset.id = monster.id;
-  el.style.left = `${monster.x}%`;
-  el.style.top = `${monster.y}%`;
-  el.innerHTML = `
-    <div class="monster-body">${monster.icon}</div>
-    <div class="monster-hp"><div class="monster-hp-fill"></div></div>
-  `;
-  return el;
-}
+function startBattle() {
+  clearInterval(battleTimer);
+  clearInterval(bossTimerInterval);
 
-function selectNextTarget() {
-  const alive = state.monsters.filter((monster) => monster.alive);
-  if (alive.length === 0) {
-    state.targetId = null;
-    return;
-  }
+  state.hp = getMaxHp();
+  currentEnemy = createEnemy();
 
-  alive.sort((a, b) => {
-    const da = distanceToHero(a);
-    const db = distanceToHero(b);
-    return da - db;
-  });
+  if (currentEnemy.isBoss) {
+    bossTimeLeft = 30;
+    bossTimer.classList.remove("hidden");
+    bossTimerInterval = setInterval(() => {
+      bossTimeLeft--;
+      bossTimer.textContent = `남은 시간: ${bossTimeLeft}초`;
 
-  state.targetId = alive[0].id;
-  updateTargetClass();
-}
-
-function distanceToHero(monster) {
-  const heroX = 50;
-  const heroY = 56;
-  return Math.hypot(monster.x - heroX, monster.y - heroY);
-}
-
-function updateTargetClass() {
-  document.querySelectorAll(".monster").forEach((el) => {
-    el.classList.toggle("target", el.dataset.id === state.targetId);
-  });
-}
-
-function gameLoop(now) {
-  const delta = (now - state.lastTickAt) / 1000;
-  state.lastTickAt = now;
-
-  if (!state.paused) {
-    if (state.stageType === "boss") {
-      state.bossTimeLeft -= delta;
-      if (state.bossTimeLeft <= 0) {
-        state.bossTimeLeft = 0;
-        failBossStage();
+      if (bossTimeLeft <= 0) {
+        failStage("시간 초과! 보스 공략 실패");
       }
-    }
-
-    if (now - state.lastAttackAt >= state.attackInterval) {
-      attackTarget(now);
-    }
-  }
-
-  render();
-  requestAnimationFrame(gameLoop);
-}
-
-function attackTarget(now) {
-  let target = state.monsters.find((monster) => monster.id === state.targetId && monster.alive);
-  if (!target) {
-    selectNextTarget();
-    target = state.monsters.find((monster) => monster.id === state.targetId && monster.alive);
-  }
-
-  if (!target) return;
-
-  state.lastAttackAt = now;
-  const rawDamage = Math.floor(state.atk * randomBetween(0.86, 1.18));
-  const damage = target.type === "boss" ? getPower() : rawDamage;
-  target.hp = Math.max(0, target.hp - damage);
-
-  playAttackAnimation(target, damage);
-  updateMonsterHp(target);
-
-  if (target.hp <= 0) {
-    killMonster(target);
-  }
-}
-
-function playAttackAnimation(target, damage) {
-  els.hero.classList.remove("attack");
-  void els.hero.offsetWidth;
-  els.hero.classList.add("attack");
-
-  const monsterEl = document.querySelector(`[data-id="${target.id}"]`);
-  if (monsterEl) {
-    monsterEl.classList.add("hit");
-    setTimeout(() => monsterEl.classList.remove("hit"), 130);
-  }
-
-  const slash = document.createElement("div");
-  slash.className = "slash";
-  slash.style.left = `${target.x}%`;
-  slash.style.top = `${target.y}%`;
-  els.damageLayer.appendChild(slash);
-  setTimeout(() => slash.remove(), 300);
-
-  const damageText = document.createElement("div");
-  damageText.className = `damage-text ${target.type === "boss" ? "boss-damage" : ""}`;
-  damageText.style.left = `${target.x}%`;
-  damageText.style.top = `${target.y - 5}%`;
-  damageText.textContent = `-${formatNumber(damage)}`;
-  els.damageLayer.appendChild(damageText);
-  setTimeout(() => damageText.remove(), 700);
-}
-
-function updateMonsterHp(monster) {
-  const monsterEl = document.querySelector(`[data-id="${monster.id}"]`);
-  if (!monsterEl) return;
-  const fill = monsterEl.querySelector(".monster-hp-fill");
-  fill.style.width = `${(monster.hp / monster.maxHp) * 100}%`;
-}
-
-function killMonster(monster) {
-  monster.alive = false;
-  state.killed += 1;
-  state.gold += monster.gold;
-  gainExp(monster.exp);
-
-  const monsterEl = document.querySelector(`[data-id="${monster.id}"]`);
-  if (monsterEl) {
-    monsterEl.classList.add("dead");
-    setTimeout(() => monsterEl.remove(), 260);
-  }
-
-  if (state.killed >= state.killGoal) {
-    setTimeout(clearStage, 500);
+    }, 1000);
   } else {
-    selectNextTarget();
-  }
-}
-
-function clearStage() {
-  if (state.paused) return;
-  showToast(state.stageType === "boss" ? "보스 클리어! 다음 챕터로 이동" : "스테이지 클리어!");
-
-  if (state.stageInChapter >= 5) {
-    state.chapter += 1;
-    state.stageInChapter = 1;
-  } else {
-    state.stageInChapter += 1;
+    bossTimer.classList.add("hidden");
   }
 
-  setTimeout(createStage, 650);
+  updateBattleUI();
+
+  battleTimer = setInterval(() => {
+    attackEnemy();
+  }, 900);
 }
 
-function failBossStage() {
-  state.paused = true;
-  showToast("보스 실패! 이전 일반 스테이지로 복귀");
+function attackEnemy() {
+  if (!currentEnemy) return;
 
+  const damage = getTotalAtk();
+  currentEnemy.hp -= damage;
+
+  battleLog.textContent = `주인공이 ${currentEnemy.name}에게 ${damage} 피해!`;
+
+  hero.style.left = "190px";
   setTimeout(() => {
-    state.stageInChapter = 4;
-    state.paused = false;
-    createStage();
-  }, 1200);
-}
+    hero.style.left = "36px";
+  }, 220);
 
-function gainExp(amount) {
-  state.exp += amount;
-  while (state.exp >= state.expToNext) {
-    state.exp -= state.expToNext;
-    state.level += 1;
-    state.atk += 3;
-    state.expToNext = Math.floor(state.expToNext * 1.25 + 8);
-    showToast(`레벨 업! LV.${state.level}`);
-  }
-}
-
-function buyAtkUpgrade() {
-  if (state.gold < state.atkCost) {
-    showToast("골드가 부족해");
+  if (currentEnemy.hp <= 0) {
+    clearInterval(battleTimer);
+    clearInterval(bossTimerInterval);
+    winStage();
     return;
   }
 
-  state.gold -= state.atkCost;
-  state.atk += 5;
-  state.atkCost = Math.floor(state.atkCost * 1.35 + 8);
-  showToast("공격력 강화 완료!");
-  render();
-}
+  state.hp -= Math.max(1, currentEnemy.atk - getDefense());
 
-function buySpeedUpgrade() {
-  if (state.gold < state.speedCost) {
-    showToast("골드가 부족해");
+  if (state.hp <= 0) {
+    failStage("체력 부족! 스테이지 공략 실패");
     return;
   }
 
-  state.gold -= state.speedCost;
-  state.attackInterval = Math.max(360, state.attackInterval - 55);
-  state.speedCost = Math.floor(state.speedCost * 1.45 + 10);
-  showToast("공격속도 강화 완료!");
-  render();
+  updateBattleUI();
 }
 
-function render() {
-  els.chapterText.textContent = state.chapter;
-  els.stageText.textContent = `${state.chapter}-${state.stageInChapter}`;
-  els.goldText.textContent = formatNumber(state.gold);
-  els.stageTypeText.textContent = state.stageType === "boss" ? "보스 스테이지" : "일반 스테이지";
-  els.stageTitle.textContent = state.stageType === "boss" ? `챕터 ${state.chapter} 보스` : stageNames[(state.stageInChapter - 1) % stageNames.length];
-  els.timerBox.classList.toggle("hidden", state.stageType !== "boss");
-  els.bossTimerText.textContent = state.bossTimeLeft.toFixed(1);
+function getDefense() {
+  let def = 0;
+  Object.values(state.equipment).forEach(item => {
+    if (item) def += item.def || 0;
+  });
+  return def;
+}
 
-  if (state.stageType === "boss") {
-    const boss = state.monsters[0];
-    const hpPercent = boss ? Math.ceil((boss.hp / boss.maxHp) * 100) : 0;
-    const bossHp = boss ? formatNumber(boss.hp) : 0;
-    const bossMaxHp = boss ? formatNumber(boss.maxHp) : 0;
-    els.goalText.textContent = `보스 HP ${bossHp} / ${bossMaxHp} (${hpPercent}%)`;
-    els.progressFill.style.width = `${hpPercent}%`;
-    els.progressFill.classList.add("boss-hp-fill");
+function winStage() {
+  state.gold += currentEnemy.reward;
+
+  if (isBossStage()) {
+    state.stage++;
+    state.subStage = 1;
+    battleLog.textContent = `보스 클리어! 다음 지역으로 이동`;
   } else {
-    els.goalText.textContent = `몬스터 ${state.killed} / ${state.killGoal}`;
-    els.progressFill.style.width = `${(state.killed / state.killGoal) * 100}%`;
-    els.progressFill.classList.remove("boss-hp-fill");
+    state.subStage++;
+    battleLog.textContent = `스테이지 클리어! ${currentEnemy.reward}골드 획득`;
   }
 
-  els.powerText.textContent = `전투력 ${formatNumber(getPower())}`;
-  els.levelText.textContent = state.level;
-  els.expText.textContent = `${state.exp} / ${state.expToNext}`;
-  els.atkText.textContent = state.atk;
-  els.atkCostText.textContent = `비용 ${state.atkCost}G`;
-  els.speedCostText.textContent = `비용 ${state.speedCost}G`;
+  saveState();
+  updateAllUI();
+
+  setTimeout(startBattle, 1200);
 }
 
-function getPower() {
-  const speedBonus = Math.round((900 - state.attackInterval) / 10);
-  return state.atk * 2 + state.level * 7 + speedBonus;
+function failStage(reason) {
+  clearInterval(battleTimer);
+  clearInterval(bossTimerInterval);
+
+  if (state.subStage > 1) {
+    state.subStage--;
+  }
+
+  battleLog.textContent = `${reason}. 이전 스테이지에서 재화를 모으는 중`;
+  saveState();
+  updateAllUI();
+
+  setTimeout(startBattle, 1600);
 }
 
-let toastTimer;
-function showToast(message) {
-  clearTimeout(toastTimer);
-  els.toast.textContent = message;
-  els.toast.classList.remove("hidden");
-  toastTimer = setTimeout(() => els.toast.classList.add("hidden"), 1300);
+function updateBattleUI() {
+  stageLabel.textContent = isBossStage()
+    ? `Boss ${getStageNumber()}`
+    : `Stage ${getStageNumber()}`;
+
+  goldText.textContent = state.gold;
+  powerText.textContent = getTotalAtk();
+
+  enemyName.textContent = currentEnemy.name;
+  monster.textContent = currentEnemy.icon;
+
+  const hpPercent = Math.max(0, currentEnemy.hp / currentEnemy.maxHp * 100);
+  enemyHpFill.style.width = `${hpPercent}%`;
+  enemyHpText.textContent = `${Math.max(0, Math.ceil(currentEnemy.hp))} / ${currentEnemy.maxHp} (${Math.ceil(hpPercent)}%)`;
+
+  if (currentEnemy.isBoss) {
+    bossTimer.textContent = `남은 시간: ${bossTimeLeft}초`;
+  }
 }
 
-function randomBetween(min, max) {
-  return Math.random() * (max - min) + min;
+function updateAllUI() {
+  goldText.textContent = state.gold;
+  powerText.textContent = getTotalAtk();
+
+  equipmentList.innerHTML = `
+    <p>무기: ${formatItem(state.equipment.weapon)}</p>
+    <p>방어구: ${formatItem(state.equipment.armor)}</p>
+    <p>장신구: ${formatItem(state.equipment.accessory)}</p>
+  `;
+
+  buffList.innerHTML = state.buffs.length
+    ? state.buffs.map(b => `<p>${b.name} / ${b.duration}초</p>`).join("")
+    : "보유 버프 없음";
+
+  collectionList.innerHTML = state.companions.length
+    ? state.companions.map(c => `<p>${c.name} / ${c.role} / 공격력 +${c.atk}</p>`).join("")
+    : "수집한 동료 없음";
+
+  squadList.innerHTML = state.squad.length
+    ? state.squad.map(c => `<p>${c.name} 참여 중</p>`).join("")
+    : "스쿼드에 편성된 동료 없음";
+
+  officeName.textContent = `작은 사무실 Lv.${state.officeLevel}`;
+  officeVisual.textContent = state.officeLevel >= 3 ? "🏢" : "🏠";
+
+  townCompanions.textContent = state.companions.length
+    ? state.companions.slice(0, state.officeLevel).map(c => c.name).join(", ")
+    : "없음";
 }
 
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
+function formatItem(item) {
+  if (!item) return "없음";
+  return `${item.name} / 공격 +${item.atk || 0}, 방어 +${item.def || 0}, 체력 +${item.hp || 0}`;
 }
 
-function formatNumber(value) {
-  return Math.floor(value).toLocaleString("ko-KR");
+function gatherItem() {
+  const isBuff = Math.random() < 0.25;
+  const item = isBuff
+    ? randomPick(buffPool)
+    : randomPick(itemPool);
+
+  if (item.type === "buff") {
+    showModal(
+      "기간제 버프 획득!",
+      `
+        <p>${item.name}</p>
+        <p>${item.atk ? `공격력 +${item.atk}` : ""}</p>
+        <p>${item.hp ? `체력 +${item.hp}` : ""}</p>
+      `,
+      [
+        {
+          text: "적용하기",
+          action: () => {
+            state.buffs.push(item);
+            saveState();
+            updateAllUI();
+            closeModal();
+          },
+        },
+        { text: "드랍하기", action: closeModal },
+      ]
+    );
+    return;
+  }
+
+  const current = state.equipment[item.type];
+
+  showModal(
+    `${item.typeName} 획득!`,
+    `
+      <p><strong>획득:</strong> ${formatItem(item)}</p>
+      <hr />
+      <p><strong>현재:</strong> ${formatItem(current)}</p>
+    `,
+    [
+      {
+        text: "적용하기",
+        action: () => {
+          state.equipment[item.type] = item;
+          saveState();
+          updateAllUI();
+          closeModal();
+        },
+      },
+      { text: "드랍하기", action: closeModal },
+    ]
+  );
 }
 
-els.atkUpgradeBtn.addEventListener("click", buyAtkUpgrade);
-els.speedUpgradeBtn.addEventListener("click", buySpeedUpgrade);
+function companionGacha() {
+  if (state.gold < 100) {
+    companionResult.textContent = "골드가 부족합니다.";
+    return;
+  }
 
-createStage();
-requestAnimationFrame(gameLoop);
+  state.gold -= 100;
+  const companion = randomPick(companionPool);
+  state.companions.push(companion);
+
+  if (state.squad.length < 3) {
+    state.squad.push(companion);
+  }
+
+  companionResult.innerHTML = `${companion.name} 획득! / ${companion.role} / 공격력 +${companion.atk}`;
+  saveState();
+  updateAllUI();
+}
+
+function randomPick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function showModal(title, content, buttons) {
+  modalTitle.textContent = title;
+  modalContent.innerHTML = content;
+  modalButtons.innerHTML = "";
+
+  buttons.forEach(btn => {
+    const button = document.createElement("button");
+    button.textContent = btn.text;
+    button.onclick = btn.action;
+    modalButtons.appendChild(button);
+  });
+
+  modal.classList.remove("hidden");
+}
+
+function closeModal() {
+  modal.classList.add("hidden");
+}
+
+document.querySelectorAll(".nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.screen).classList.add("active");
+
+    updateAllUI();
+  });
+});
+
+document.querySelectorAll(".inner-tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".inner-tab").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".inner-content").forEach(c => c.classList.remove("active"));
+
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.inner).classList.add("active");
+  });
+});
+
+itemGatherBtn.addEventListener("click", gatherItem);
+companionGachaBtn.addEventListener("click", companionGacha);
+
+offlineRewardBtn.addEventListener("click", () => {
+  const now = Date.now();
+  const diffMin = Math.floor((now - state.lastSaveAt) / 60000);
+  const reward = Math.min(diffMin * 10, 1000);
+
+  state.gold += reward;
+  saveState();
+  updateAllUI();
+
+  showModal(
+    "비접속 보상",
+    `<p>${reward}골드를 획득했습니다.</p>`,
+    [{ text: "확인", action: closeModal }]
+  );
+});
+
+upgradeOfficeBtn.addEventListener("click", () => {
+  const cost = state.officeLevel * 200;
+
+  if (state.gold < cost) {
+    alert("골드가 부족합니다.");
+    return;
+  }
+
+  state.gold -= cost;
+  state.officeLevel++;
+  saveState();
+  updateAllUI();
+});
+
+soundToggleBtn.addEventListener("click", () => {
+  state.sound = !state.sound;
+  soundToggleBtn.textContent = state.sound ? "ON" : "OFF";
+  saveState();
+});
+
+resetBtn.addEventListener("click", () => {
+  if (!confirm("정말 데이터를 초기화할까요?")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+});
+
+updateAllUI();
+startBattle();
