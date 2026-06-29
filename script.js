@@ -1,5 +1,4 @@
-const SAVE_KEY = "gameCompanyIdleV6";
-
+const SAVE_KEY = "gameCompanyIdleV7";
 const RECRUIT_COST = 200;
 const MAX_SQUAD_SIZE = 4;
 
@@ -363,6 +362,8 @@ function startBattle() {
 }
 
 function work() {
+  if (!task) return;
+
   hero.classList.add("attack");
   squadInBattle.classList.add("attack");
 
@@ -466,11 +467,9 @@ function upgradeCompany() {
   const next = nextCompany();
 
   if (!next) {
-    showModal(
-      "최대 레벨",
-      `<p>이미 최고 등급 회사입니다.</p>`,
-      [{ text: "확인", action: closeModal }]
-    );
+    showModal("최대 레벨", `<p>이미 최고 등급 회사입니다.</p>`, [
+      { text: "확인", action: closeModal },
+    ]);
     return;
   }
 
@@ -582,7 +581,6 @@ function setSquadSlot(slotIndex, teamId) {
 
 function removeSquadSlot(slotIndex) {
   state.squad[slotIndex] = null;
-
   save();
   updateUI();
 }
@@ -673,7 +671,7 @@ function renderSquadSlots() {
           <p>회사 업그레이드로 해금됩니다.</p>
         </div>
       `;
-    } else if (team) {
+    } else if (team && owned) {
       slot.innerHTML = `
         <div class="slot-icon">${team.icon}</div>
         <div>
@@ -779,10 +777,9 @@ function updateCompanyUI() {
   companyNameText.textContent = company.name;
   companyDescText.textContent = company.desc;
   companyLevelText.textContent = `Lv.${company.level}`;
+  ownedCountText.textContent = `${ownedTeamCount()}명`;
   companySlotText.textContent = `${company.squadSlots}칸`;
   companyOfflineBonusText.textContent = `x${company.offlineBonus}`;
-  companyGradeText.textContent = company.recruitGrades.join(", ");
-
   companyProgressBar.style.width = `${percent}%`;
 
   if (next) {
@@ -825,7 +822,6 @@ function updateUI() {
   buffText.textContent = state.buff ? itemText(state.buff) : "없음";
 
   squadPowerText.textContent = `업무력 +${formatNumber(squadPower())}`;
-  ownedCountText.textContent = `${ownedTeamCount()}명`;
   soundBtn.textContent = state.sound ? "ON" : "OFF";
 
   updateCompanyUI();
