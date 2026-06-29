@@ -80,19 +80,22 @@ button:active:not(:disabled) {
   margin-bottom: 8px;
 }
 
-.summary-panel div {
+.summary-panel div,
+.company-stat-panel div {
   background: #27314d;
   border-radius: 15px;
   padding: 7px 10px;
 }
 
-.summary-panel span {
+.summary-panel span,
+.company-stat-panel span {
   display: block;
   font-size: 11px;
   color: #aeb8d8;
 }
 
-.summary-panel strong {
+.summary-panel strong,
+.company-stat-panel strong {
   display: block;
   margin-top: 1px;
   font-size: 15px;
@@ -170,11 +173,16 @@ button:active:not(:disabled) {
   background: #6b5338;
 }
 
-.task-title-row {
+.task-title-row,
+.section-title-row,
+.team-name-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+}
+
+.task-title-row {
   margin-bottom: 7px;
 }
 
@@ -182,13 +190,16 @@ button:active:not(:disabled) {
   font-size: 15px;
 }
 
-#timerText {
+#timerText,
+.section-title-row span,
+.team-name-row span {
   color: #ffd560;
   font-size: 12px;
   font-weight: bold;
 }
 
-.hp-bar {
+.hp-bar,
+.company-progress {
   height: 14px;
   border-radius: 999px;
   overflow: hidden;
@@ -199,6 +210,17 @@ button:active:not(:disabled) {
   height: 100%;
   width: 100%;
   background: linear-gradient(90deg, #ff5d55, #ffb13d);
+}
+
+.company-progress {
+  margin: 10px 0;
+  background: rgba(0, 0, 0, 0.32);
+}
+
+#companyProgressBar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #7fffd4, #ffd560);
 }
 
 #enemyHpText {
@@ -223,7 +245,8 @@ button:active:not(:disabled) {
   text-align: center;
 }
 
-#gatherBtn {
+#gatherBtn,
+.wide-btn.orange {
   width: 100%;
   font-size: 16px;
   background: linear-gradient(135deg, #ff9c3d, #ff5656);
@@ -259,24 +282,6 @@ button:active:not(:disabled) {
   line-height: 1.45;
 }
 
-.section-title-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-.section-title-row h3 {
-  margin: 0;
-}
-
-.section-title-row span {
-  color: #ffd560;
-  font-size: 12px;
-  font-weight: bold;
-}
-
 .company-card {
   text-align: center;
 }
@@ -293,34 +298,25 @@ button:active:not(:disabled) {
 }
 
 .company-stat-panel div {
-  background: #27314d;
-  border-radius: 16px;
   padding: 12px;
 }
 
-.company-stat-panel span {
-  display: block;
-  color: #aeb8d8;
-  font-size: 12px;
-}
-
 .company-stat-panel strong {
-  display: block;
-  margin-top: 4px;
   color: #ffd560;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .wide-btn {
   width: 100%;
   font-size: 16px;
-  background: linear-gradient(135deg, #ff9c3d, #ff5656);
+  background: linear-gradient(135deg, #5368ff, #7f5cff);
 }
 
-.squad-slots {
+.squad-slots,
+.owned-team-list,
+.team-list {
   display: grid;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 10px;
 }
 
 .squad-slot {
@@ -341,6 +337,10 @@ button:active:not(:disabled) {
   background: rgba(255, 213, 96, 0.09);
 }
 
+.squad-slot.locked {
+  opacity: 0.55;
+}
+
 .slot-icon,
 .team-icon {
   width: 44px;
@@ -358,11 +358,13 @@ button:active:not(:disabled) {
   color: #aeb8d8;
 }
 
-.squad-slot strong {
+.squad-slot strong,
+.owned-team-card strong {
   font-size: 14px;
 }
 
-.squad-slot p {
+.squad-slot p,
+.owned-team-card p {
   margin: 1px 0 0;
   font-size: 12px;
   color: #c8d3ff;
@@ -372,12 +374,6 @@ button:active:not(:disabled) {
   padding: 7px 10px;
   background: #e24d4d;
   font-size: 12px;
-}
-
-.owned-team-list,
-.team-list {
-  display: grid;
-  gap: 10px;
 }
 
 .owned-team-card {
@@ -393,16 +389,6 @@ button:active:not(:disabled) {
 .owned-team-card.selected {
   background: rgba(83, 104, 255, 0.25);
   outline: 2px solid rgba(127, 255, 212, 0.35);
-}
-
-.owned-team-card strong {
-  font-size: 13px;
-}
-
-.owned-team-card p {
-  margin: 2px 0 0;
-  color: #c8d3ff;
-  font-size: 12px;
 }
 
 .owned-team-card button {
@@ -442,20 +428,11 @@ button:active:not(:disabled) {
   min-width: 0;
 }
 
-.team-name-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-}
-
 .team-name-row strong {
   font-size: 14px;
 }
 
 .team-name-row span {
-  color: #ffd560;
-  font-size: 12px;
-  font-weight: bold;
   white-space: nowrap;
 }
 
@@ -573,10 +550,4 @@ button:active:not(:disabled) {
 
 #modalActions button {
   flex: 1;
-}
-
-@media (min-width: 431px) {
-  #app {
-    min-height: 100vh;
-  }
 }

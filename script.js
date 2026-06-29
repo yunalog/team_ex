@@ -1,6 +1,60 @@
-const SAVE_KEY = "gameCompanyIdleV5";
+const SAVE_KEY = "gameCompanyIdleV6";
+
 const RECRUIT_COST = 200;
-const MAX_SQUAD_SIZE = 3;
+const MAX_SQUAD_SIZE = 4;
+
+const companyLevels = [
+  {
+    level: 1,
+    name: "작은 게임회사",
+    desc: "작은 사무실에서 시작하는 신입사원의 회사 성장기입니다.",
+    squadSlots: 1,
+    offlineBonus: 1,
+    offlineMaxMinutes: 720,
+    recruitGrades: ["N"],
+    upgradeCost: 500,
+  },
+  {
+    level: 2,
+    name: "인디 스튜디오",
+    desc: "작지만 팀워크가 생기기 시작한 인디 스튜디오입니다.",
+    squadSlots: 2,
+    offlineBonus: 1.2,
+    offlineMaxMinutes: 720,
+    recruitGrades: ["N", "R"],
+    upgradeCost: 1500,
+  },
+  {
+    level: 3,
+    name: "성장형 게임사",
+    desc: "프로젝트와 팀원이 늘어나며 본격적으로 성장하는 회사입니다.",
+    squadSlots: 3,
+    offlineBonus: 1.5,
+    offlineMaxMinutes: 960,
+    recruitGrades: ["N", "R", "SR"],
+    upgradeCost: 4000,
+  },
+  {
+    level: 4,
+    name: "중견 게임사",
+    desc: "안정적인 개발/사업 구조를 갖춘 중견 게임사입니다.",
+    squadSlots: 3,
+    offlineBonus: 1.8,
+    offlineMaxMinutes: 1080,
+    recruitGrades: ["N", "R", "SR"],
+    upgradeCost: 10000,
+  },
+  {
+    level: 5,
+    name: "대형 게임사",
+    desc: "강력한 팀과 시스템을 갖춘 대형 게임사입니다.",
+    squadSlots: 4,
+    offlineBonus: 2.2,
+    offlineMaxMinutes: 1440,
+    recruitGrades: ["N", "R", "SR", "SSR"],
+    upgradeCost: null,
+  },
+];
 
 const defaultState = {
   gold: 0,
@@ -10,6 +64,9 @@ const defaultState = {
   baseAtk: 10,
   sound: true,
   lastSave: Date.now(),
+  company: {
+    level: 1,
+  },
   equipment: {
     weapon: null,
     armor: null,
@@ -17,7 +74,7 @@ const defaultState = {
   },
   buff: null,
   ownedTeams: {},
-  squad: [null, null, null],
+  squad: [null, null, null, null],
 };
 
 let state = JSON.parse(localStorage.getItem(SAVE_KEY)) || structuredClone(defaultState);
@@ -25,6 +82,10 @@ let state = JSON.parse(localStorage.getItem(SAVE_KEY)) || structuredClone(defaul
 state = {
   ...structuredClone(defaultState),
   ...state,
+  company: {
+    ...defaultState.company,
+    ...(state.company || {}),
+  },
   equipment: {
     ...defaultState.equipment,
     ...(state.equipment || {}),
@@ -32,7 +93,9 @@ state = {
   ownedTeams: {
     ...(state.ownedTeams || {}),
   },
-  squad: Array.isArray(state.squad) ? [...state.squad, null, null, null].slice(0, 3) : [null, null, null],
+  squad: Array.isArray(state.squad)
+    ? [...state.squad, null, null, null, null].slice(0, MAX_SQUAD_SIZE)
+    : [null, null, null, null],
 };
 
 let task = null;
@@ -50,7 +113,7 @@ const teamPool = [
     basePower: 7,
     upgradeCost: 120,
     rarity: "N",
-    weight: 35,
+    weight: 40,
   },
   {
     id: "developer",
@@ -61,7 +124,7 @@ const teamPool = [
     basePower: 12,
     upgradeCost: 220,
     rarity: "R",
-    weight: 25,
+    weight: 28,
   },
   {
     id: "artist",
@@ -72,7 +135,7 @@ const teamPool = [
     basePower: 16,
     upgradeCost: 360,
     rarity: "R",
-    weight: 20,
+    weight: 24,
   },
   {
     id: "qa",
@@ -80,10 +143,10 @@ const teamPool = [
     job: "QA",
     name: "날카로운 QA 담당자",
     desc: "버그 업무 처리에 강한 팀원",
-    basePower: 20,
-    upgradeCost: 520,
+    basePower: 22,
+    upgradeCost: 560,
     rarity: "SR",
-    weight: 12,
+    weight: 16,
   },
   {
     id: "marketer",
@@ -91,10 +154,21 @@ const teamPool = [
     job: "사업",
     name: "성과형 마케터",
     desc: "비접속 보상 효율이 좋은 팀원",
-    basePower: 26,
-    upgradeCost: 760,
+    basePower: 28,
+    upgradeCost: 820,
     rarity: "SR",
-    weight: 8,
+    weight: 12,
+  },
+  {
+    id: "director",
+    icon: "👑",
+    job: "총괄",
+    name: "베테랑 디렉터",
+    desc: "회사 전체 전투력을 끌어올리는 핵심 팀원",
+    basePower: 42,
+    upgradeCost: 1500,
+    rarity: "SSR",
+    weight: 5,
   },
 ];
 
@@ -122,6 +196,14 @@ function save() {
 
 function formatNumber(value) {
   return Math.floor(value).toLocaleString("ko-KR");
+}
+
+function currentCompany() {
+  return companyLevels.find(company => company.level === state.company.level) || companyLevels[0];
+}
+
+function nextCompany() {
+  return companyLevels.find(company => company.level === state.company.level + 1) || null;
 }
 
 function getTeam(id) {
@@ -156,8 +238,13 @@ function teamPower(id) {
   return team.basePower * owned.level;
 }
 
+function availableSquadSlots() {
+  return currentCompany().squadSlots;
+}
+
 function squadPower() {
-  return state.squad.reduce((sum, teamId) => {
+  return state.squad.reduce((sum, teamId, index) => {
+    if (index >= availableSquadSlots()) return sum;
     if (!teamId) return sum;
     return sum + teamPower(teamId);
   }, 0);
@@ -180,7 +267,8 @@ function maxHp() {
 }
 
 function offlineRate() {
-  return Math.max(5, Math.floor(squadPower() * 0.9 + equipmentAtk() * 0.25));
+  const base = Math.max(5, Math.floor(squadPower() * 0.9 + equipmentAtk() * 0.25));
+  return Math.floor(base * currentCompany().offlineBonus);
 }
 
 function ownedTeamCount() {
@@ -195,16 +283,22 @@ function getUpgradeCost(teamId) {
   return team.upgradeCost * owned.level;
 }
 
+function availableRecruitPool() {
+  const grades = currentCompany().recruitGrades;
+  return teamPool.filter(team => grades.includes(team.rarity));
+}
+
 function pickRandomTeam() {
-  const totalWeight = teamPool.reduce((sum, team) => sum + team.weight, 0);
+  const pool = availableRecruitPool();
+  const totalWeight = pool.reduce((sum, team) => sum + team.weight, 0);
   let random = Math.random() * totalWeight;
 
-  for (const team of teamPool) {
+  for (const team of pool) {
     random -= team.weight;
     if (random <= 0) return team;
   }
 
-  return teamPool[0];
+  return pool[0];
 }
 
 function makeTask() {
@@ -321,13 +415,9 @@ function failStage(reason) {
   clearInterval(battleLoop);
   clearInterval(bossTimer);
 
-  if (state.stage > 1) {
-    state.stage--;
-  } else {
-    state.stage = 1;
-  }
-
+  state.stage = Math.max(1, state.stage - 1);
   log.textContent = `${reason}! 이전 업무에서 월급 파밍`;
+
   save();
   updateUI();
   setTimeout(startBattle, 1500);
@@ -368,6 +458,46 @@ function gatherItem() {
         action: closeModal,
       },
     ]
+  );
+}
+
+function upgradeCompany() {
+  const company = currentCompany();
+  const next = nextCompany();
+
+  if (!next) {
+    showModal(
+      "최대 레벨",
+      `<p>이미 최고 등급 회사입니다.</p>`,
+      [{ text: "확인", action: closeModal }]
+    );
+    return;
+  }
+
+  if (state.gold < company.upgradeCost) {
+    showModal(
+      "월급 부족",
+      `<p>회사 업그레이드에는 월급 ${formatNumber(company.upgradeCost)}이 필요합니다.</p>`,
+      [{ text: "확인", action: closeModal }]
+    );
+    return;
+  }
+
+  state.gold -= company.upgradeCost;
+  state.company.level++;
+
+  save();
+  updateUI();
+
+  showModal(
+    "회사 성장!",
+    `
+      <p><b>${next.name}</b>로 성장했습니다.</p>
+      <p>스쿼드 슬롯: ${next.squadSlots}칸</p>
+      <p>비접속 배율: x${next.offlineBonus}</p>
+      <p>채용 가능 등급: ${next.recruitGrades.join(", ")}</p>
+    `,
+    [{ text: "확인", action: closeModal }]
   );
 }
 
@@ -436,6 +566,7 @@ function upgradeTeam(teamId) {
 }
 
 function setSquadSlot(slotIndex, teamId) {
+  if (slotIndex >= availableSquadSlots()) return;
   if (!getOwnedTeam(teamId)) return;
 
   const alreadyIndex = state.squad.indexOf(teamId);
@@ -465,11 +596,14 @@ function autoSetSquad(teamId) {
     return;
   }
 
-  const emptyIndex = state.squad.findIndex(slot => slot === null);
+  const emptyIndex = state.squad.findIndex((slot, index) => {
+    return index < availableSquadSlots() && slot === null;
+  });
+
   if (emptyIndex === -1) {
     showModal(
       "스쿼드 가득 참",
-      `<p>스쿼드는 최대 ${MAX_SQUAD_SIZE}명까지 편성할 수 있습니다.</p><p>기존 슬롯을 해제한 뒤 다시 편성해 주세요.</p>`,
+      `<p>현재 회사 레벨에서는 최대 ${availableSquadSlots()}명까지 편성할 수 있습니다.</p><p>회사 업그레이드로 슬롯을 늘릴 수 있습니다.</p>`,
       [{ text: "확인", action: closeModal }]
     );
     return;
@@ -480,7 +614,7 @@ function autoSetSquad(teamId) {
 
 function claimOfflineReward() {
   const minutes = Math.floor((Date.now() - state.lastSave) / 60000);
-  const cappedMinutes = Math.min(minutes, 720);
+  const cappedMinutes = Math.min(minutes, currentCompany().offlineMaxMinutes);
   const reward = cappedMinutes * offlineRate();
 
   state.gold += reward;
@@ -491,8 +625,9 @@ function claimOfflineReward() {
     "비접속 보상",
     `
       <p>비접속 시간: <b>${formatNumber(minutes)}분</b></p>
-      <p>적용 시간: <b>${formatNumber(cappedMinutes)}분</b> / 최대 720분</p>
-      <p>편성 스쿼드 기준 분당 보상: <b>${formatNumber(offlineRate())}</b></p>
+      <p>적용 시간: <b>${formatNumber(cappedMinutes)}분</b> / 최대 ${formatNumber(currentCompany().offlineMaxMinutes)}분</p>
+      <p>회사 배율: <b>x${currentCompany().offlineBonus}</b></p>
+      <p>분당 보상: <b>${formatNumber(offlineRate())}</b></p>
       <p>획득 월급: <b>${formatNumber(reward)}</b></p>
     `,
     [{ text: "확인", action: closeModal }]
@@ -506,7 +641,8 @@ function itemText(item) {
 function renderBattleSquad() {
   squadInBattle.innerHTML = "";
 
-  state.squad.forEach(teamId => {
+  state.squad.forEach((teamId, index) => {
+    if (index >= availableSquadSlots()) return;
     if (!teamId) return;
 
     const team = getTeam(teamId);
@@ -522,32 +658,40 @@ function renderSquadSlots() {
   squadSlots.innerHTML = "";
 
   state.squad.forEach((teamId, index) => {
-    const team = getTeam(teamId);
+    const unlocked = index < availableSquadSlots();
+    const team = unlocked ? getTeam(teamId) : null;
     const owned = teamId ? getOwnedTeam(teamId) : null;
 
     const slot = document.createElement("div");
-    slot.className = `squad-slot ${team ? "filled" : ""}`;
+    slot.className = `squad-slot ${team ? "filled" : ""} ${unlocked ? "" : "locked"}`;
 
-    slot.innerHTML = team
-      ? `
+    if (!unlocked) {
+      slot.innerHTML = `
+        <div class="slot-icon empty">🔒</div>
+        <div>
+          <strong>${index + 1}번 슬롯 잠김</strong>
+          <p>회사 업그레이드로 해금됩니다.</p>
+        </div>
+      `;
+    } else if (team) {
+      slot.innerHTML = `
         <div class="slot-icon">${team.icon}</div>
         <div>
           <strong>${team.name}</strong>
           <p>Lv.${owned.level} / 업무력 +${formatNumber(teamPower(team.id))}</p>
         </div>
         <button>해제</button>
-      `
-      : `
+      `;
+
+      slot.querySelector("button").onclick = () => removeSquadSlot(index);
+    } else {
+      slot.innerHTML = `
         <div class="slot-icon empty">+</div>
         <div>
           <strong>${index + 1}번 슬롯</strong>
           <p>보유 팀원에서 편성하세요.</p>
         </div>
       `;
-
-    const button = slot.querySelector("button");
-    if (button) {
-      button.onclick = () => removeSquadSlot(index);
     }
 
     squadSlots.appendChild(slot);
@@ -594,6 +738,7 @@ function renderCompanyTeamList() {
   teamPool.forEach(team => {
     const owned = getOwnedTeam(team.id);
     const isOwned = !!owned;
+    const isRecruitable = currentCompany().recruitGrades.includes(team.rarity);
     const level = isOwned ? owned.level : 0;
     const cost = isOwned ? getUpgradeCost(team.id) : RECRUIT_COST;
 
@@ -606,14 +751,14 @@ function renderCompanyTeamList() {
         <div class="team-info">
           <div class="team-name-row">
             <strong>[${team.rarity}] ${team.name}</strong>
-            <span>${isOwned ? `Lv.${level}` : "미보유"}</span>
+            <span>${isOwned ? `Lv.${level}` : isRecruitable ? "채용 가능" : "회사 레벨 부족"}</span>
           </div>
           <p>${team.desc}</p>
           <small>${team.job} / ${isOwned ? `현재 업무력 +${formatNumber(teamPower(team.id))}` : `기본 업무력 +${team.basePower}`}</small>
         </div>
       </div>
       <button class="team-action" ${isOwned ? "" : "disabled"}>
-        ${isOwned ? `레벨업 ${formatNumber(cost)}` : "채용 필요"}
+        ${isOwned ? `레벨업 ${formatNumber(cost)}` : "미보유"}
       </button>
     `;
 
@@ -624,6 +769,36 @@ function renderCompanyTeamList() {
 
     companyTeamList.appendChild(card);
   });
+}
+
+function updateCompanyUI() {
+  const company = currentCompany();
+  const next = nextCompany();
+  const percent = next ? Math.min(100, (state.gold / company.upgradeCost) * 100) : 100;
+
+  companyNameText.textContent = company.name;
+  companyDescText.textContent = company.desc;
+  companyLevelText.textContent = `Lv.${company.level}`;
+  companySlotText.textContent = `${company.squadSlots}칸`;
+  companyOfflineBonusText.textContent = `x${company.offlineBonus}`;
+  companyGradeText.textContent = company.recruitGrades.join(", ");
+
+  companyProgressBar.style.width = `${percent}%`;
+
+  if (next) {
+    nextCompanyText.textContent = `다음: ${next.name}`;
+    companyUpgradeInfo.textContent = `필요 월급 ${formatNumber(company.upgradeCost)} / 다음 효과: 스쿼드 ${next.squadSlots}칸, 비접속 x${next.offlineBonus}, 채용등급 ${next.recruitGrades.join(", ")}`;
+    companyUpgradeBtn.textContent = `회사 업그레이드 ${formatNumber(company.upgradeCost)}`;
+    companyUpgradeBtn.disabled = false;
+  } else {
+    nextCompanyText.textContent = "최대 단계";
+    companyUpgradeInfo.textContent = "이미 최고 등급 회사입니다.";
+    companyUpgradeBtn.textContent = "최대 레벨";
+    companyUpgradeBtn.disabled = true;
+  }
+
+  recruitCostText.textContent = `월급 ${formatNumber(RECRUIT_COST)}`;
+  recruitInfoText.textContent = `현재 채용 가능 등급: ${company.recruitGrades.join(", ")} / 회사 업그레이드 시 더 높은 등급이 해금됩니다.`;
 }
 
 function updateUI() {
@@ -650,10 +825,10 @@ function updateUI() {
   buffText.textContent = state.buff ? itemText(state.buff) : "없음";
 
   squadPowerText.textContent = `업무력 +${formatNumber(squadPower())}`;
-  companySquadPowerText.textContent = formatNumber(squadPower());
   ownedCountText.textContent = `${ownedTeamCount()}명`;
   soundBtn.textContent = state.sound ? "ON" : "OFF";
 
+  updateCompanyUI();
   renderBattleSquad();
   renderSquadSlots();
   renderOwnedTeamList();
@@ -692,6 +867,7 @@ document.querySelectorAll(".tab").forEach(button => {
 gatherBtn.onclick = gatherItem;
 offlineBtn.onclick = claimOfflineReward;
 recruitBtn.onclick = recruitTeam;
+companyUpgradeBtn.onclick = upgradeCompany;
 
 soundBtn.onclick = () => {
   state.sound = !state.sound;
