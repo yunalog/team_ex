@@ -1,4 +1,4 @@
-const SAVE_KEY = "gameCompanyIdle";
+const SAVE_KEY = "gameCompanyIdleV2";
 
 const defaultState = {
   gold: 0,
@@ -16,7 +16,8 @@ const defaultState = {
   buff: null,
 };
 
-let state = JSON.parse(localStorage.getItem(SAVE_KEY)) || defaultState;
+let state = JSON.parse(localStorage.getItem(SAVE_KEY)) || structuredClone(defaultState);
+
 let task = null;
 let battleLoop = null;
 let bossTimer = null;
@@ -79,7 +80,7 @@ function makeTask() {
 
   if (isBoss()) {
     return {
-      name: `대형 업데이트 출시 ${state.world}`,
+      name: `대형 업데이트 출시`,
       icon: "🚀",
       hp: 250 + level * 40,
       maxHp: 250 + level * 40,
@@ -117,11 +118,14 @@ function startBattle() {
 
   if (isBoss()) {
     bossTime = 30;
-    timerText.textContent = `마감까지 ${bossTime}초`;
+    timerText.textContent = `마감 ${bossTime}초`;
     bossTimer = setInterval(() => {
       bossTime--;
-      timerText.textContent = `마감까지 ${bossTime}초`;
-      if (bossTime <= 0) failStage("출시 마감 실패");
+      timerText.textContent = `마감 ${bossTime}초`;
+
+      if (bossTime <= 0) {
+        failStage("출시 마감 실패");
+      }
     }, 1000);
   } else {
     timerText.textContent = "";
@@ -129,17 +133,17 @@ function startBattle() {
 
   updateUI();
 
-  battleLoop = setInterval(() => {
-    work();
-  }, 900);
+  battleLoop = setInterval(work, 900);
 }
 
 function work() {
   hero.classList.add("attack");
-  setTimeout(() => hero.classList.remove("attack"), 230);
+  setTimeout(() => hero.classList.remove("attack"), 220);
 
-  task.hp -= totalAtk();
-  log.textContent = `${task.name} 처리 중! 업무력 ${totalAtk()} 적용`;
+  const damage = totalAtk();
+  task.hp -= damage;
+
+  log.textContent = `${task.name} 처리 중! 업무력 ${damage} 적용`;
 
   if (task.hp <= 0) {
     clearTask();
@@ -180,8 +184,11 @@ function failStage(reason) {
   clearInterval(battleLoop);
   clearInterval(bossTimer);
 
-  if (state.stage > 1) state.stage--;
-  else state.stage = 1;
+  if (state.stage > 1) {
+    state.stage--;
+  } else {
+    state.stage = 1;
+  }
 
   log.textContent = `${reason}! 이전 업무에서 월급 파밍`;
   save();
@@ -208,18 +215,21 @@ function gatherItem() {
       {
         text: "적용하기",
         action: () => {
-          if (result.slot === "buff") state.buff = result;
-          else state.equipment[result.slot] = result;
+          if (result.slot === "buff") {
+            state.buff = result;
+          } else {
+            state.equipment[result.slot] = result;
+          }
 
           closeModal();
           save();
           updateUI();
-        }
+        },
       },
       {
         text: "드랍하기",
-        action: closeModal
-      }
+        action: closeModal,
+      },
     ]
   );
 }
@@ -235,12 +245,13 @@ function updateUI() {
 
   goldText.textContent = state.gold;
   powerText.textContent = totalAtk();
+  hpText.textContent = Math.max(0, state.hp);
 
   enemyName.textContent = task ? task.name : "";
   enemy.textContent = task ? task.icon : "🐞";
 
   if (task) {
-    const percent = Math.max(0, task.hp / task.maxHp * 100);
+    const percent = Math.max(0, (task.hp / task.maxHp) * 100);
     enemyHpBar.style.width = `${percent}%`;
     enemyHpText.textContent = `${Math.max(0, Math.ceil(task.hp))} / ${task.maxHp} (${Math.ceil(percent)}%)`;
   }
@@ -259,10 +270,10 @@ function showModal(title, body, actions) {
   modalActions.innerHTML = "";
 
   actions.forEach(action => {
-    const btn = document.createElement("button");
-    btn.textContent = action.text;
-    btn.onclick = action.action;
-    modalActions.appendChild(btn);
+    const button = document.createElement("button");
+    button.textContent = action.text;
+    button.onclick = action.action;
+    modalActions.appendChild(button);
   });
 
   modal.classList.remove("hidden");
@@ -272,13 +283,13 @@ function closeModal() {
   modal.classList.add("hidden");
 }
 
-document.querySelectorAll(".tab").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+document.querySelectorAll(".tab").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+    document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
 
-    btn.classList.add("active");
-    document.getElementById(btn.dataset.page).classList.add("active");
+    button.classList.add("active");
+    document.getElementById(button.dataset.page).classList.add("active");
   });
 });
 
@@ -307,6 +318,7 @@ soundBtn.onclick = () => {
 
 resetBtn.onclick = () => {
   if (!confirm("데이터를 초기화할까요?")) return;
+
   localStorage.removeItem(SAVE_KEY);
   location.reload();
 };

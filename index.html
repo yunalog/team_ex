@@ -8,93 +8,109 @@
 </head>
 <body>
   <div id="app">
-    <header>
+    <header class="top-header">
       <div>
-        <b>신입사원</b>
-        <span id="stageText">Project 1-1</span>
+        <strong>신입사원</strong>
+        <p id="stageText">Project 1-1</p>
       </div>
       <button id="offlineBtn">비접속 보상</button>
     </header>
 
-    <main id="battle" class="page active">
-      <section class="battle-box">
-        <div class="status">
-          <span>업무력 <b id="powerText">10</b></span>
-          <span>월급 <b id="goldText">0</b></span>
+    <main id="workPage" class="page active">
+      <section class="summary-panel">
+        <div>
+          <span>업무력</span>
+          <strong id="powerText">10</strong>
         </div>
+        <div>
+          <span>월급</span>
+          <strong id="goldText">0</strong>
+        </div>
+        <div>
+          <span>체력</span>
+          <strong id="hpText">100</strong>
+        </div>
+      </section>
 
-        <div class="office-bg">
+      <section class="battle-card">
+        <div class="office-props">
           <span>🪴</span>
           <span>💻</span>
           <span>📋</span>
         </div>
 
-        <div class="field">
-          <div id="hero" class="unit hero">👩‍💼</div>
-          <div id="enemy" class="unit enemy">🐞</div>
+        <div class="battle-lane">
+          <div id="hero" class="character hero">👩‍💼</div>
+          <div id="enemy" class="character enemy">🐞</div>
+        </div>
+      </section>
+
+      <section class="task-panel">
+        <div class="task-title-row">
+          <strong id="enemyName">버그 리포트</strong>
+          <span id="timerText"></span>
         </div>
 
-        <div class="enemy-info">
-          <b id="enemyName">버그 리포트</b>
-          <div class="hp-bg">
-            <div id="enemyHpBar"></div>
-          </div>
-          <p id="enemyHpText">100 / 100</p>
-          <p id="timerText"></p>
+        <div class="hp-bar">
+          <div id="enemyHpBar"></div>
         </div>
 
+        <p id="enemyHpText">100 / 100</p>
         <div id="log">업무 처리 시작!</div>
       </section>
 
-      <section class="gather-box">
+      <section class="gather-panel">
         <button id="gatherBtn">📦 사무실 탐색</button>
-        <p>노트북 / 후드집업 / 사원증 / 커피 / 박카스 획득</p>
+        <p>노트북 · 후드집업 · 사원증 · 커피 · 박카스 획득</p>
       </section>
     </main>
 
-    <main id="character" class="page">
-      <h2>캐릭터 강화</h2>
+    <main id="upgradePage" class="page">
+      <h2>강화</h2>
 
-      <div class="card">
+      <section class="card">
         <h3>장착 아이템</h3>
         <p>업무장비: <span id="weaponText">없음</span></p>
         <p>복장: <span id="armorText">없음</span></p>
         <p>소지품: <span id="accessoryText">없음</span></p>
-      </div>
+      </section>
 
-      <div class="card">
+      <section class="card">
         <h3>버프 아이템</h3>
         <p id="buffText">없음</p>
-      </div>
+      </section>
 
-      <div class="card muted">
+      <section class="card muted">
         팀원 뽑기 / 스쿼드 구성 / 팀원 수집은 다음 단계에서 추가
-      </div>
+      </section>
     </main>
 
-    <main id="town" class="page">
+    <main id="companyPage" class="page">
       <h2>회사</h2>
-      <div class="card town">
-        <div class="house">🏢</div>
+
+      <section class="card company-card">
+        <div class="company-icon">🏢</div>
         <h3>작은 게임회사</h3>
-        <p>지금은 작은 사무실입니다. 나중에 팀원을 뽑고 회사를 확장할 수 있습니다.</p>
-      </div>
+        <p>아직은 작은 사무실입니다. 이후 팀원을 뽑고 회사를 확장할 수 있습니다.</p>
+      </section>
     </main>
 
-    <main id="settings" class="page">
+    <main id="settingPage" class="page">
       <h2>설정</h2>
-      <div class="card row">
+
+      <section class="card row-card">
         <span>사운드</span>
         <button id="soundBtn">ON</button>
-      </div>
+      </section>
+
       <button id="resetBtn" class="danger">데이터 초기화</button>
     </main>
 
-    <nav>
-      <button class="tab active" data-page="battle">업무</button>
-      <button class="tab" data-page="character">강화</button>
-      <button class="tab" data-page="town">회사</button>
-      <button class="tab" data-page="settings">설정</button>
+    <nav class="bottom-nav">
+      <button class="tab active" data-page="workPage">업무</button>
+      <button class="tab" data-page="upgradePage">강화</button>
+      <button class="tab" data-page="companyPage">회사</button>
+      <button class="tab" data-page="settingPage">설정</button>
     </nav>
   </div>
 

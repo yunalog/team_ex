@@ -4,7 +4,7 @@
 
 body {
   margin: 0;
-  background: #10131c;
+  background: #0f1220;
   color: white;
   font-family: Arial, sans-serif;
   overflow: hidden;
@@ -15,36 +15,45 @@ body {
   max-width: 430px;
   height: 100dvh;
   margin: 0 auto;
-  background: #1b2133;
+  background: #171d2e;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-header {
+.top-header {
   height: 60px;
   flex: 0 0 60px;
-  padding: 10px 12px;
-  background: #2a3350;
+  padding: 10px 14px;
+  background: #293350;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
-header span {
-  display: block;
-  margin-top: 3px;
-  color: #ffd36a;
+.top-header strong {
+  font-size: 16px;
+}
+
+.top-header p {
+  margin: 3px 0 0;
+  color: #ffd560;
   font-size: 12px;
+  font-weight: bold;
 }
 
 button {
   border: 0;
-  border-radius: 12px;
-  padding: 9px 11px;
-  background: #5268ff;
+  border-radius: 13px;
+  padding: 9px 12px;
+  background: #5368ff;
   color: white;
   font-weight: bold;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.97);
 }
 
 .page {
@@ -60,200 +69,225 @@ button {
   flex-direction: column;
 }
 
-#battle.page.active {
+#workPage.active {
   overflow: hidden;
 }
 
-.battle-box {
-  flex: 1;
-  min-height: 0;
-  border-radius: 22px;
-  background: linear-gradient(#b9d6ff 0%, #edf5ff 55%, #d8c3a5 56%, #b98f5e 100%);
+.summary-panel {
+  height: 48px;
+  flex: 0 0 48px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.summary-panel div {
+  background: #27314d;
+  border-radius: 16px;
+  padding: 7px 10px;
+}
+
+.summary-panel span {
+  display: block;
+  font-size: 11px;
+  color: #aeb8d8;
+}
+
+.summary-panel strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 15px;
+}
+
+.battle-card {
+  height: 42%;
+  min-height: 250px;
+  max-height: 330px;
+  flex: 0 0 auto;
   position: relative;
   overflow: hidden;
-  border: 3px solid rgba(255,255,255,0.18);
+  border-radius: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+  background:
+    linear-gradient(#bcd9ff 0%, #eaf5ff 58%, #d7bd95 59%, #b78c5d 100%);
 }
 
-.status {
+.office-props {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  display: flex;
-  gap: 7px;
-  z-index: 2;
-}
-
-.status span {
-  background: rgba(0,0,0,0.35);
-  padding: 7px 9px;
-  border-radius: 12px;
-  font-size: 12px;
-}
-
-.office-bg {
-  position: absolute;
-  top: 20%;
-  left: 18px;
-  right: 18px;
+  top: 22%;
+  left: 26px;
+  right: 26px;
   display: flex;
   justify-content: space-around;
-  font-size: 34px;
-  opacity: 0.45;
+  font-size: 32px;
+  opacity: 0.55;
 }
 
-.field {
+.battle-lane {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 33%;
-  height: 120px;
+  bottom: 18%;
+  height: 110px;
 }
 
-.unit {
+.character {
   position: absolute;
   bottom: 0;
-  font-size: 46px;
-  transition: 0.25s;
+  font-size: 54px;
+  transition: 0.22s ease;
 }
 
 .hero {
-  left: 34px;
+  left: 44px;
 }
 
 .hero.attack {
-  left: 160px;
+  left: 165px;
 }
 
 .enemy {
-  right: 48px;
+  right: 54px;
 }
 
-.enemy-info {
-  position: absolute;
-  left: 14px;
-  right: 14px;
-  bottom: 54px;
-  background: rgba(0,0,0,0.45);
-  border-radius: 16px;
-  padding: 10px;
+.task-panel {
+  flex: 0 0 auto;
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 20px;
+  background: #6b5338;
 }
 
-.hp-bg {
-  height: 14px;
-  background: #222;
+.task-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.task-title-row strong {
+  font-size: 15px;
+}
+
+#timerText {
+  color: #ffd560;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.hp-bar {
+  height: 15px;
   border-radius: 999px;
   overflow: hidden;
-  margin: 7px 0;
+  background: #1c1c1c;
 }
 
 #enemyHpBar {
   height: 100%;
   width: 100%;
-  background: linear-gradient(90deg, #ff4e4e, #ffb24e);
+  background: linear-gradient(90deg, #ff5d55, #ffb13d);
 }
 
-.enemy-info p {
-  margin: 2px 0;
+#enemyHpText {
+  margin: 6px 0 8px;
   font-size: 12px;
+  font-weight: bold;
 }
 
 #log {
-  position: absolute;
-  left: 14px;
-  right: 14px;
-  bottom: 10px;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.32);
   border-radius: 14px;
   padding: 9px 10px;
   font-size: 12px;
+  font-weight: bold;
 }
 
-.gather-box {
+.gather-panel {
   flex: 0 0 auto;
-  margin-top: 10px;
-  background: #28314b;
-  padding: 10px 12px;
-  border-radius: 18px;
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 20px;
+  background: #283351;
   text-align: center;
 }
 
 #gatherBtn {
   width: 100%;
   font-size: 16px;
-  background: linear-gradient(135deg, #ff9d3d, #ff5959);
+  background: linear-gradient(135deg, #ff9c3d, #ff5656);
 }
 
-.gather-box p {
-  margin: 6px 0 0;
-  color: #cbd3ff;
+.gather-panel p {
+  margin: 7px 0 0;
   font-size: 11px;
+  color: #c8d3ff;
 }
 
 .card {
-  background: #28314b;
+  background: #283351;
   border-radius: 18px;
   padding: 14px;
   margin-bottom: 10px;
+  line-height: 1.6;
 }
 
 .card h3 {
-  margin-top: 0;
+  margin: 0 0 8px;
 }
 
 .muted {
-  color: #b7bfdc;
+  color: #aeb8d8;
 }
 
-.town {
+.company-card {
   text-align: center;
 }
 
-.house {
-  font-size: 74px;
+.company-icon {
+  font-size: 78px;
 }
 
-.row {
+.row-card {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
 .danger {
   width: 100%;
-  background: #e34c4c;
+  background: #e24d4d;
 }
 
-nav {
+.bottom-nav {
   height: 62px;
   flex: 0 0 62px;
-  width: 100%;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  background: #111827;
-  z-index: 5;
+  background: #101827;
 }
 
 .tab {
   border-radius: 0;
   background: transparent;
-  color: #929bb8;
+  color: #99a4c6;
   font-size: 13px;
-  padding: 8px 4px;
 }
 
 .tab.active {
-  background: #2d3652;
+  background: #303b5d;
   color: white;
 }
 
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.65);
+  background: rgba(0, 0, 0, 0.65);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 10;
+  justify-content: center;
+  z-index: 20;
 }
 
 .modal.hidden {
@@ -262,10 +296,14 @@ nav {
 
 .modal-box {
   width: min(360px, 90vw);
-  background: #28314b;
-  border-radius: 22px;
+  background: #283351;
+  border-radius: 24px;
   padding: 20px;
   text-align: center;
+}
+
+.modal-box h2 {
+  margin-top: 0;
 }
 
 #modalActions {
