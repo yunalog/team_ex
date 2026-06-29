@@ -4,121 +4,127 @@
 
 body {
   margin: 0;
-  background: #10131f;
+  background: #10131c;
+  color: white;
   font-family: Arial, sans-serif;
-  color: #fff;
 }
 
 #app {
   max-width: 430px;
   min-height: 100vh;
   margin: 0 auto;
-  background: linear-gradient(#20263a, #111522);
-  position: relative;
-  overflow: hidden;
+  background: #1b2133;
   padding-bottom: 76px;
 }
 
-.top-bar {
+header {
   height: 64px;
   padding: 12px;
+  background: #2a3350;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #2d3652;
-  border-bottom: 1px solid rgba(255,255,255,0.12);
 }
 
-.top-bar span {
+header span {
   display: block;
   margin-top: 4px;
-  font-size: 13px;
   color: #ffd36a;
+  font-size: 13px;
 }
 
 button {
   border: 0;
   border-radius: 12px;
   padding: 10px 12px;
-  font-weight: 700;
-  color: #fff;
-  background: #5067ff;
-  cursor: pointer;
+  background: #5268ff;
+  color: white;
+  font-weight: bold;
 }
 
-button:active {
-  transform: scale(0.97);
-}
-
-.screen {
+.page {
   display: none;
   padding: 12px;
 }
 
-.screen.active {
+.page.active {
   display: block;
 }
 
-.battle-field {
-  height: 540px;
-  border-radius: 24px;
-  background: linear-gradient(#7f9edc, #d6ecff 55%, #8ac878 56%, #5e9b55);
+.battle-box {
+  height: 520px;
+  border-radius: 22px;
+  background: linear-gradient(#b9d6ff 0%, #edf5ff 55%, #d8c3a5 56%, #b98f5e 100%);
   position: relative;
   overflow: hidden;
-  border: 3px solid rgba(255,255,255,0.2);
+  border: 3px solid rgba(255,255,255,0.18);
 }
 
-.battle-info {
+.status {
   position: absolute;
   top: 12px;
   left: 12px;
   display: flex;
   gap: 8px;
-  z-index: 5;
+  z-index: 2;
 }
 
-.battle-info div {
+.status span {
   background: rgba(0,0,0,0.35);
   padding: 8px 10px;
   border-radius: 12px;
   font-size: 13px;
 }
 
-.side-view {
+.office-bg {
+  position: absolute;
+  top: 100px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-around;
+  font-size: 42px;
+  opacity: 0.5;
+}
+
+.field {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 118px;
-  height: 190px;
+  bottom: 165px;
+  height: 160px;
 }
 
 .unit {
   position: absolute;
   bottom: 0;
   font-size: 58px;
-  transition: left 0.25s ease;
-  filter: drop-shadow(0 8px 8px rgba(0,0,0,0.35));
+  transition: 0.25s;
 }
 
 .hero {
-  left: 36px;
+  left: 34px;
 }
 
-.monster {
-  right: 46px;
+.hero.attack {
+  left: 175px;
 }
 
-.enemy-panel {
+.enemy {
+  right: 48px;
+}
+
+.enemy-info {
   position: absolute;
   left: 14px;
   right: 14px;
-  bottom: 64px;
+  bottom: 62px;
   background: rgba(0,0,0,0.45);
-  padding: 12px;
   border-radius: 16px;
+  padding: 12px;
 }
 
-.hp-bar {
+.hp-bg {
   height: 16px;
   background: #222;
   border-radius: 999px;
@@ -126,122 +132,68 @@ button:active {
   margin: 8px 0;
 }
 
-#enemyHpFill {
+#enemyHpBar {
   height: 100%;
   width: 100%;
-  background: linear-gradient(90deg, #ff5252, #ffb052);
+  background: linear-gradient(90deg, #ff4e4e, #ffb24e);
 }
 
-#enemyHpText,
-#bossTimer {
+.enemy-info p {
+  margin: 3px 0;
   font-size: 13px;
-  color: #eee;
 }
 
-.battle-log {
+#log {
   position: absolute;
   left: 14px;
   right: 14px;
   bottom: 14px;
-  height: 38px;
-  border-radius: 14px;
   background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
+  border-radius: 14px;
+  padding: 10px;
   font-size: 13px;
 }
 
-.gather-panel {
+.gather-box {
   margin-top: 12px;
-  background: #252d45;
-  padding: 12px;
+  background: #28314b;
+  padding: 14px;
   border-radius: 20px;
   text-align: center;
 }
 
-.gather-panel button {
+#gatherBtn {
   width: 100%;
-  font-size: 16px;
-  background: linear-gradient(135deg, #ff9e3d, #ff5a5a);
+  font-size: 17px;
+  background: linear-gradient(135deg, #ff9d3d, #ff5959);
 }
 
-.gather-panel p {
+.gather-box p {
   margin: 8px 0 0;
-  font-size: 12px;
-  color: #cbd4ff;
-}
-
-.bottom-nav {
-  position: fixed;
-  left: 50%;
-  bottom: 0;
-  width: 100%;
-  max-width: 430px;
-  transform: translateX(-50%);
-  height: 68px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  background: #151a2a;
-  border-top: 1px solid rgba(255,255,255,0.12);
-  z-index: 20;
-}
-
-.nav-btn {
-  border-radius: 0;
-  background: transparent;
-  color: #8d96b8;
+  color: #cbd3ff;
   font-size: 12px;
 }
 
-.nav-btn.active {
-  color: #fff;
-  background: #2c3553;
-}
-
-.inner-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  margin-bottom: 12px;
-}
-
-.inner-tab {
-  padding: 9px 6px;
-  font-size: 11px;
-  background: #2a314b;
-}
-
-.inner-tab.active {
-  background: #5067ff;
-}
-
-.inner-content {
-  display: none;
-}
-
-.inner-content.active {
-  display: block;
-}
-
-.card,
-.town-card {
-  background: #252d45;
+.card {
+  background: #28314b;
   border-radius: 18px;
   padding: 14px;
   margin-bottom: 12px;
-  line-height: 1.6;
 }
 
-.town-card {
+.muted {
+  color: #b7bfdc;
+}
+
+.town {
   text-align: center;
 }
 
-#officeVisual {
-  font-size: 84px;
+.house {
+  font-size: 80px;
 }
 
-.setting-row {
+.row {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -249,7 +201,32 @@ button:active {
 
 .danger {
   width: 100%;
-  background: #e44c4c;
+  background: #e34c4c;
+}
+
+nav {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  max-width: 430px;
+  width: 100%;
+  height: 68px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: #111827;
+}
+
+.tab {
+  border-radius: 0;
+  background: transparent;
+  color: #929bb8;
+  font-size: 13px;
+}
+
+.tab.active {
+  background: #2d3652;
+  color: white;
 }
 
 .modal {
@@ -257,9 +234,9 @@ button:active {
   inset: 0;
   background: rgba(0,0,0,0.65);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 99;
+  align-items: center;
+  z-index: 10;
 }
 
 .modal.hidden {
@@ -268,23 +245,18 @@ button:active {
 
 .modal-box {
   width: min(360px, 90vw);
-  background: #252d45;
-  border-radius: 24px;
+  background: #28314b;
+  border-radius: 22px;
   padding: 20px;
   text-align: center;
-  border: 1px solid rgba(255,255,255,0.18);
 }
 
-#modalButtons {
+#modalActions {
   display: flex;
   gap: 8px;
   margin-top: 16px;
 }
 
-#modalButtons button {
+#modalActions button {
   flex: 1;
-}
-
-.hidden {
-  display: none;
 }

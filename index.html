@@ -3,122 +3,106 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>방치형 RPG 타이쿤 프로토타입</title>
+  <title>게임회사 키우기</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="app">
-    <header class="top-bar">
+    <header>
       <div>
-        <strong>신입 모험가</strong>
-        <span id="stageLabel">Stage 1-1</span>
+        <b>신입사원 윤아</b>
+        <span id="stageText">Project 1-1</span>
       </div>
-      <button id="offlineRewardBtn">비접속 보상</button>
+      <button id="offlineBtn">비접속 보상</button>
     </header>
 
-    <main id="battleScreen" class="screen active">
-      <section class="battle-field">
-        <div class="battle-info">
-          <div>전투력 <span id="powerText">0</span></div>
-          <div>골드 <span id="goldText">0</span></div>
+    <main id="battle" class="page active">
+      <section class="battle-box">
+        <div class="status">
+          <span>업무력 <b id="powerText">10</b></span>
+          <span>월급 <b id="goldText">0</b></span>
         </div>
 
-        <div class="side-view">
-          <div id="hero" class="unit hero">🧍</div>
-          <div id="monster" class="unit monster">🐺</div>
+        <div class="office-bg">
+          <span>🪴</span>
+          <span>💻</span>
+          <span>📋</span>
         </div>
 
-        <div class="enemy-panel">
-          <div id="enemyName">몬스터</div>
-          <div class="hp-bar">
-            <div id="enemyHpFill"></div>
+        <div class="field">
+          <div id="hero" class="unit hero">👩‍💼</div>
+          <div id="enemy" class="unit enemy">🐞</div>
+        </div>
+
+        <div class="enemy-info">
+          <b id="enemyName">버그 리포트</b>
+          <div class="hp-bg">
+            <div id="enemyHpBar"></div>
           </div>
-          <div id="enemyHpText">0 / 0</div>
-          <div id="bossTimer" class="hidden">남은 시간: 30초</div>
+          <p id="enemyHpText">100 / 100</p>
+          <p id="timerText"></p>
         </div>
 
-        <div id="battleLog" class="battle-log">전투 시작!</div>
+        <div id="log">업무 처리 시작!</div>
       </section>
 
-      <section class="gather-panel">
-        <button id="itemGatherBtn">⛏ 아이템 채집 / 뽑기</button>
-        <p>무기 · 방어구 · 장신구 · 기간제 버프 아이템 획득</p>
-      </section>
-    </main>
-
-    <main id="characterScreen" class="screen">
-      <div class="inner-tabs">
-        <button class="inner-tab active" data-inner="companionGacha">동료 뽑기</button>
-        <button class="inner-tab" data-inner="squad">스쿼드 구성</button>
-        <button class="inner-tab" data-inner="collection">수집 현황</button>
-        <button class="inner-tab" data-inner="items">장착 아이템</button>
-      </div>
-
-      <section id="companionGacha" class="inner-content active">
-        <h2>동료 뽑기</h2>
-        <button id="companionGachaBtn">동료 뽑기 100골드</button>
-        <div id="companionResult" class="card">아직 뽑은 동료가 없습니다.</div>
-      </section>
-
-      <section id="squad" class="inner-content">
-        <h2>스쿼드 구성</h2>
-        <div id="squadList" class="card"></div>
-      </section>
-
-      <section id="collection" class="inner-content">
-        <h2>동료 수집 현황</h2>
-        <div id="collectionList" class="card"></div>
-      </section>
-
-      <section id="items" class="inner-content">
-        <h2>장착 아이템</h2>
-        <div id="equipmentList" class="card"></div>
-        <h3>보유 버프</h3>
-        <div id="buffList" class="card"></div>
+      <section class="gather-box">
+        <button id="gatherBtn">📦 사무실 탐색</button>
+        <p>노트북 / 후드집업 / 사원증 / 커피 / 박카스 획득</p>
       </section>
     </main>
 
-    <main id="townScreen" class="screen">
-      <h2>타운</h2>
-      <div class="town-card">
-        <div id="officeVisual">🏠</div>
-        <h3 id="officeName">작은 사무실 Lv.1</h3>
-        <p id="officeDesc">아직은 작은 사무실입니다. 동료를 배치하고 건물을 강화해 성장시킬 수 있습니다.</p>
-        <button id="upgradeOfficeBtn">건물 강화 200골드</button>
-      </div>
+    <main id="character" class="page">
+      <h2>캐릭터 강화</h2>
+
       <div class="card">
-        <h3>배치된 동료</h3>
-        <div id="townCompanions">없음</div>
+        <h3>장착 아이템</h3>
+        <p>업무장비: <span id="weaponText">없음</span></p>
+        <p>복장: <span id="armorText">없음</span></p>
+        <p>소지품: <span id="accessoryText">없음</span></p>
+      </div>
+
+      <div class="card">
+        <h3>버프 아이템</h3>
+        <p id="buffText">없음</p>
+      </div>
+
+      <div class="card muted">
+        팀원 뽑기 / 스쿼드 구성 / 팀원 수집은 다음 단계에서 추가
       </div>
     </main>
 
-    <main id="settingScreen" class="screen">
+    <main id="town" class="page">
+      <h2>회사</h2>
+      <div class="card town">
+        <div class="house">🏢</div>
+        <h3>작은 게임회사</h3>
+        <p>지금은 작은 사무실입니다. 나중에 팀원을 뽑고 회사를 확장할 수 있습니다.</p>
+      </div>
+    </main>
+
+    <main id="settings" class="page">
       <h2>설정</h2>
-      <div class="card setting-row">
+      <div class="card row">
         <span>사운드</span>
-        <button id="soundToggleBtn">ON</button>
-      </div>
-      <div class="card">
-        <h3>로그인 정보</h3>
-        <p>현재는 로컬 저장 방식입니다.</p>
-        <p>Firebase 로그인은 이후 연결 예정.</p>
+        <button id="soundBtn">ON</button>
       </div>
       <button id="resetBtn" class="danger">데이터 초기화</button>
     </main>
 
-    <nav class="bottom-nav">
-      <button class="nav-btn active" data-screen="battleScreen">전투</button>
-      <button class="nav-btn" data-screen="characterScreen">캐릭터 강화</button>
-      <button class="nav-btn" data-screen="townScreen">타운</button>
-      <button class="nav-btn" data-screen="settingScreen">설정</button>
+    <nav>
+      <button class="tab active" data-page="battle">업무</button>
+      <button class="tab" data-page="character">강화</button>
+      <button class="tab" data-page="town">회사</button>
+      <button class="tab" data-page="settings">설정</button>
     </nav>
   </div>
 
   <div id="modal" class="modal hidden">
     <div class="modal-box">
-      <h2 id="modalTitle">획득!</h2>
-      <div id="modalContent"></div>
-      <div id="modalButtons"></div>
+      <h2 id="modalTitle"></h2>
+      <div id="modalBody"></div>
+      <div id="modalActions"></div>
     </div>
   </div>
 
