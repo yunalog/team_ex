@@ -7,19 +7,23 @@ body {
   background: #10131c;
   color: white;
   font-family: Arial, sans-serif;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 #app {
+  width: 100%;
   max-width: 430px;
-  min-height: 100dvh;
+  height: 100dvh;
   margin: 0 auto;
   background: #1b2133;
-  padding-bottom: 70px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 header {
   height: 60px;
+  flex: 0 0 60px;
   padding: 10px 12px;
   background: #2a3350;
   display: flex;
@@ -45,17 +49,24 @@ button {
 
 .page {
   display: none;
+  flex: 1;
+  min-height: 0;
   padding: 10px;
+  overflow-y: auto;
 }
 
 .page.active {
-  display: block;
+  display: flex;
+  flex-direction: column;
+}
+
+#battle.page.active {
+  overflow: hidden;
 }
 
 .battle-box {
-  height: calc(100dvh - 214px);
-  min-height: 360px;
-  max-height: 470px;
+  flex: 1;
+  min-height: 0;
   border-radius: 22px;
   background: linear-gradient(#b9d6ff 0%, #edf5ff 55%, #d8c3a5 56%, #b98f5e 100%);
   position: relative;
@@ -81,12 +92,12 @@ button {
 
 .office-bg {
   position: absolute;
-  top: 76px;
+  top: 20%;
   left: 18px;
   right: 18px;
   display: flex;
   justify-content: space-around;
-  font-size: 36px;
+  font-size: 34px;
   opacity: 0.45;
 }
 
@@ -94,14 +105,14 @@ button {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 142px;
-  height: 140px;
+  bottom: 33%;
+  height: 120px;
 }
 
 .unit {
   position: absolute;
   bottom: 0;
-  font-size: 50px;
+  font-size: 46px;
   transition: 0.25s;
 }
 
@@ -110,7 +121,7 @@ button {
 }
 
 .hero.attack {
-  left: 165px;
+  left: 160px;
 }
 
 .enemy {
@@ -121,7 +132,7 @@ button {
   position: absolute;
   left: 14px;
   right: 14px;
-  bottom: 58px;
+  bottom: 54px;
   background: rgba(0,0,0,0.45);
   border-radius: 16px;
   padding: 10px;
@@ -150,7 +161,7 @@ button {
   position: absolute;
   left: 14px;
   right: 14px;
-  bottom: 12px;
+  bottom: 10px;
   background: rgba(0,0,0,0.5);
   border-radius: 14px;
   padding: 9px 10px;
@@ -158,9 +169,10 @@ button {
 }
 
 .gather-box {
+  flex: 0 0 auto;
   margin-top: 10px;
   background: #28314b;
-  padding: 12px;
+  padding: 10px 12px;
   border-radius: 18px;
   text-align: center;
 }
@@ -172,7 +184,7 @@ button {
 }
 
 .gather-box p {
-  margin: 7px 0 0;
+  margin: 6px 0 0;
   color: #cbd3ff;
   font-size: 11px;
 }
@@ -212,13 +224,9 @@ button {
 }
 
 nav {
-  position: fixed;
-  left: 50%;
-  bottom: 0;
-  transform: translateX(-50%);
-  max-width: 430px;
-  width: 100%;
   height: 62px;
+  flex: 0 0 62px;
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   background: #111827;
