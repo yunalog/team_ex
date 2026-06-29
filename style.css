@@ -11,10 +11,12 @@ body {
 
 #app {
   width: 100%;
+  min-height: 100vh;
   max-width: 430px;
   margin: 0 auto;
   background: #171d2e;
   overflow: hidden;
+  padding-bottom: 58px;
 }
 
 .top-header {
@@ -47,7 +49,12 @@ button {
   cursor: pointer;
 }
 
-button:active {
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button:active:not(:disabled) {
   transform: scale(0.97);
 }
 
@@ -58,6 +65,11 @@ button:active {
 
 .page.active {
   display: block;
+}
+
+.page h2 {
+  margin: 4px 0 12px;
+  font-size: 20px;
 }
 
 .summary-panel {
@@ -122,15 +134,33 @@ button:active {
 }
 
 .hero {
-  left: 54px;
+  left: 42px;
 }
 
 .hero.attack {
-  left: 165px;
+  left: 145px;
 }
 
 .enemy {
-  right: 60px;
+  right: 50px;
+}
+
+.squad-in-battle {
+  position: absolute;
+  left: 88px;
+  bottom: 2px;
+  display: flex;
+  gap: 2px;
+  font-size: 28px;
+  transition: 0.22s ease;
+}
+
+.squad-in-battle.attack {
+  left: 180px;
+}
+
+.squad-in-battle span {
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.25));
 }
 
 .task-panel {
@@ -217,8 +247,34 @@ button:active {
   margin: 0 0 8px;
 }
 
-.muted {
-  color: #aeb8d8;
+.card p {
+  margin: 5px 0;
+  font-size: 13px;
+  color: #dce4ff;
+}
+
+.hint {
+  color: #aeb8d8 !important;
+  font-size: 12px !important;
+  line-height: 1.45;
+}
+
+.section-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.section-title-row h3 {
+  margin: 0;
+}
+
+.section-title-row span {
+  color: #ffd560;
+  font-size: 12px;
+  font-weight: bold;
 }
 
 .company-card {
@@ -227,6 +283,215 @@ button:active {
 
 .company-icon {
   font-size: 72px;
+}
+
+.company-stat-panel {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.company-stat-panel div {
+  background: #27314d;
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.company-stat-panel span {
+  display: block;
+  color: #aeb8d8;
+  font-size: 12px;
+}
+
+.company-stat-panel strong {
+  display: block;
+  margin-top: 4px;
+  color: #ffd560;
+  font-size: 20px;
+}
+
+.wide-btn {
+  width: 100%;
+  font-size: 16px;
+  background: linear-gradient(135deg, #ff9c3d, #ff5656);
+}
+
+.squad-slots {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.squad-slot {
+  min-height: 62px;
+  display: grid;
+  grid-template-columns: 46px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 2px dashed rgba(255, 255, 255, 0.12);
+}
+
+.squad-slot.filled {
+  border-style: solid;
+  border-color: rgba(255, 213, 96, 0.45);
+  background: rgba(255, 213, 96, 0.09);
+}
+
+.slot-icon,
+.team-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.slot-icon.empty {
+  color: #aeb8d8;
+}
+
+.squad-slot strong {
+  font-size: 14px;
+}
+
+.squad-slot p {
+  margin: 1px 0 0;
+  font-size: 12px;
+  color: #c8d3ff;
+}
+
+.squad-slot button {
+  padding: 7px 10px;
+  background: #e24d4d;
+  font-size: 12px;
+}
+
+.owned-team-list,
+.team-list {
+  display: grid;
+  gap: 10px;
+}
+
+.owned-team-card {
+  display: grid;
+  grid-template-columns: 46px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.owned-team-card.selected {
+  background: rgba(83, 104, 255, 0.25);
+  outline: 2px solid rgba(127, 255, 212, 0.35);
+}
+
+.owned-team-card strong {
+  font-size: 13px;
+}
+
+.owned-team-card p {
+  margin: 2px 0 0;
+  color: #c8d3ff;
+  font-size: 12px;
+}
+
+.owned-team-card button {
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
+.empty-text {
+  color: #aeb8d8 !important;
+  font-size: 12px !important;
+  text-align: center;
+}
+
+.team-card {
+  background: #283351;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 12px;
+}
+
+.team-card.owned {
+  border-color: rgba(255, 213, 96, 0.45);
+  background: linear-gradient(135deg, #2b3758, #27314d);
+}
+
+.team-card.locked {
+  opacity: 0.72;
+}
+
+.team-main {
+  display: flex;
+  gap: 10px;
+}
+
+.team-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.team-name-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.team-name-row strong {
+  font-size: 14px;
+}
+
+.team-name-row span {
+  color: #ffd560;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.team-info p {
+  margin: 4px 0;
+  color: #c8d3ff;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.team-info small {
+  color: #7fffd4;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.team-action {
+  width: 100%;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #5368ff, #7f5cff);
+}
+
+.recruit-result {
+  text-align: center;
+}
+
+.recruit-icon {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 44px;
 }
 
 .row-card {
@@ -241,10 +506,17 @@ button:active {
 }
 
 .bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  width: 100%;
+  max-width: 430px;
+  transform: translateX(-50%);
   height: 58px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   background: #101827;
+  z-index: 10;
 }
 
 .tab {
@@ -275,6 +547,8 @@ button:active {
 
 .modal-box {
   width: min(360px, 90vw);
+  max-height: 86vh;
+  overflow-y: auto;
   background: #283351;
   border-radius: 24px;
   padding: 20px;
@@ -285,6 +559,12 @@ button:active {
   margin-top: 0;
 }
 
+.modal-box p {
+  color: #dce4ff;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 #modalActions {
   display: flex;
   gap: 8px;
@@ -293,4 +573,10 @@ button:active {
 
 #modalActions button {
   flex: 1;
+}
+
+@media (min-width: 431px) {
+  #app {
+    min-height: 100vh;
+  }
 }
