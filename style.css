@@ -7,19 +7,20 @@ body {
   background: #10131c;
   color: white;
   font-family: Arial, sans-serif;
+  overflow-x: hidden;
 }
 
 #app {
   max-width: 430px;
-  min-height: 100vh;
+  min-height: 100dvh;
   margin: 0 auto;
   background: #1b2133;
-  padding-bottom: 76px;
+  padding-bottom: 70px;
 }
 
 header {
-  height: 64px;
-  padding: 12px;
+  height: 60px;
+  padding: 10px 12px;
   background: #2a3350;
   display: flex;
   justify-content: space-between;
@@ -28,15 +29,15 @@ header {
 
 header span {
   display: block;
-  margin-top: 4px;
+  margin-top: 3px;
   color: #ffd36a;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 button {
   border: 0;
   border-radius: 12px;
-  padding: 10px 12px;
+  padding: 9px 11px;
   background: #5268ff;
   color: white;
   font-weight: bold;
@@ -44,7 +45,7 @@ button {
 
 .page {
   display: none;
-  padding: 12px;
+  padding: 10px;
 }
 
 .page.active {
@@ -52,7 +53,9 @@ button {
 }
 
 .battle-box {
-  height: 520px;
+  height: calc(100dvh - 214px);
+  min-height: 360px;
+  max-height: 470px;
   border-radius: 22px;
   background: linear-gradient(#b9d6ff 0%, #edf5ff 55%, #d8c3a5 56%, #b98f5e 100%);
   position: relative;
@@ -62,43 +65,43 @@ button {
 
 .status {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  top: 10px;
+  left: 10px;
   display: flex;
-  gap: 8px;
+  gap: 7px;
   z-index: 2;
 }
 
 .status span {
   background: rgba(0,0,0,0.35);
-  padding: 8px 10px;
+  padding: 7px 9px;
   border-radius: 12px;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .office-bg {
   position: absolute;
-  top: 100px;
-  left: 20px;
-  right: 20px;
+  top: 76px;
+  left: 18px;
+  right: 18px;
   display: flex;
   justify-content: space-around;
-  font-size: 42px;
-  opacity: 0.5;
+  font-size: 36px;
+  opacity: 0.45;
 }
 
 .field {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 165px;
-  height: 160px;
+  bottom: 142px;
+  height: 140px;
 }
 
 .unit {
   position: absolute;
   bottom: 0;
-  font-size: 58px;
+  font-size: 50px;
   transition: 0.25s;
 }
 
@@ -107,7 +110,7 @@ button {
 }
 
 .hero.attack {
-  left: 175px;
+  left: 165px;
 }
 
 .enemy {
@@ -118,18 +121,18 @@ button {
   position: absolute;
   left: 14px;
   right: 14px;
-  bottom: 62px;
+  bottom: 58px;
   background: rgba(0,0,0,0.45);
   border-radius: 16px;
-  padding: 12px;
+  padding: 10px;
 }
 
 .hp-bg {
-  height: 16px;
+  height: 14px;
   background: #222;
   border-radius: 999px;
   overflow: hidden;
-  margin: 8px 0;
+  margin: 7px 0;
 }
 
 #enemyHpBar {
@@ -139,46 +142,50 @@ button {
 }
 
 .enemy-info p {
-  margin: 3px 0;
-  font-size: 13px;
+  margin: 2px 0;
+  font-size: 12px;
 }
 
 #log {
   position: absolute;
   left: 14px;
   right: 14px;
-  bottom: 14px;
+  bottom: 12px;
   background: rgba(0,0,0,0.5);
   border-radius: 14px;
-  padding: 10px;
-  font-size: 13px;
+  padding: 9px 10px;
+  font-size: 12px;
 }
 
 .gather-box {
-  margin-top: 12px;
+  margin-top: 10px;
   background: #28314b;
-  padding: 14px;
-  border-radius: 20px;
+  padding: 12px;
+  border-radius: 18px;
   text-align: center;
 }
 
 #gatherBtn {
   width: 100%;
-  font-size: 17px;
+  font-size: 16px;
   background: linear-gradient(135deg, #ff9d3d, #ff5959);
 }
 
 .gather-box p {
-  margin: 8px 0 0;
+  margin: 7px 0 0;
   color: #cbd3ff;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .card {
   background: #28314b;
   border-radius: 18px;
   padding: 14px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+}
+
+.card h3 {
+  margin-top: 0;
 }
 
 .muted {
@@ -190,7 +197,7 @@ button {
 }
 
 .house {
-  font-size: 80px;
+  font-size: 74px;
 }
 
 .row {
@@ -211,10 +218,11 @@ nav {
   transform: translateX(-50%);
   max-width: 430px;
   width: 100%;
-  height: 68px;
+  height: 62px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   background: #111827;
+  z-index: 5;
 }
 
 .tab {
@@ -222,6 +230,7 @@ nav {
   background: transparent;
   color: #929bb8;
   font-size: 13px;
+  padding: 8px 4px;
 }
 
 .tab.active {
