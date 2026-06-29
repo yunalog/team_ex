@@ -1,4 +1,4 @@
-const SAVE_KEY = "gameCompanyIdleV2";
+const SAVE_KEY = "gameCompanyIdleV3";
 
 const defaultState = {
   gold: 0,
@@ -27,10 +27,8 @@ const items = [
   { slot: "weapon", type: "업무장비", name: "낡은 노트북", atk: 5, hp: 0 },
   { slot: "weapon", type: "업무장비", name: "기계식 키보드", atk: 12, hp: 0 },
   { slot: "weapon", type: "업무장비", name: "고성능 개발 PC", atk: 25, hp: 0 },
-
   { slot: "armor", type: "복장", name: "회사 후드집업", atk: 0, hp: 30 },
   { slot: "armor", type: "복장", name: "편한 사무용 의자", atk: 0, hp: 70 },
-
   { slot: "accessory", type: "소지품", name: "사원증", atk: 4, hp: 10 },
   { slot: "accessory", type: "소지품", name: "명함지갑", atk: 8, hp: 30 },
 ];
@@ -80,7 +78,7 @@ function makeTask() {
 
   if (isBoss()) {
     return {
-      name: `대형 업데이트 출시`,
+      name: "대형 업데이트 출시",
       icon: "🚀",
       hp: 250 + level * 40,
       maxHp: 250 + level * 40,
@@ -132,7 +130,6 @@ function startBattle() {
   }
 
   updateUI();
-
   battleLoop = setInterval(work, 900);
 }
 

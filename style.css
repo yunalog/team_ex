@@ -7,23 +7,18 @@ body {
   background: #0f1220;
   color: white;
   font-family: Arial, sans-serif;
-  overflow: hidden;
 }
 
 #app {
   width: 100%;
   max-width: 430px;
-  height: 100dvh;
   margin: 0 auto;
   background: #171d2e;
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
 }
 
 .top-header {
-  height: 60px;
-  flex: 0 0 60px;
+  height: 58px;
   padding: 10px 14px;
   background: #293350;
   display: flex;
@@ -58,24 +53,15 @@ button:active {
 
 .page {
   display: none;
-  flex: 1;
-  min-height: 0;
   padding: 10px;
-  overflow-y: auto;
 }
 
 .page.active {
-  display: flex;
-  flex-direction: column;
-}
-
-#workPage.active {
-  overflow: hidden;
+  display: block;
 }
 
 .summary-panel {
-  height: 48px;
-  flex: 0 0 48px;
+  height: 46px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
@@ -84,7 +70,7 @@ button:active {
 
 .summary-panel div {
   background: #27314d;
-  border-radius: 16px;
+  border-radius: 15px;
   padding: 7px 10px;
 }
 
@@ -96,31 +82,27 @@ button:active {
 
 .summary-panel strong {
   display: block;
-  margin-top: 2px;
+  margin-top: 1px;
   font-size: 15px;
 }
 
 .battle-card {
-  height: 42%;
-  min-height: 250px;
-  max-height: 330px;
-  flex: 0 0 auto;
+  height: 260px;
   position: relative;
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: 22px;
   border: 3px solid rgba(255, 255, 255, 0.18);
-  background:
-    linear-gradient(#bcd9ff 0%, #eaf5ff 58%, #d7bd95 59%, #b78c5d 100%);
+  background: linear-gradient(#bcd9ff 0%, #eaf5ff 57%, #d7bd95 58%, #b78c5d 100%);
 }
 
 .office-props {
   position: absolute;
-  top: 22%;
+  top: 24%;
   left: 26px;
   right: 26px;
   display: flex;
   justify-content: space-around;
-  font-size: 32px;
+  font-size: 30px;
   opacity: 0.55;
 }
 
@@ -128,19 +110,19 @@ button:active {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 18%;
-  height: 110px;
+  bottom: 17%;
+  height: 90px;
 }
 
 .character {
   position: absolute;
   bottom: 0;
-  font-size: 54px;
+  font-size: 50px;
   transition: 0.22s ease;
 }
 
 .hero {
-  left: 44px;
+  left: 54px;
 }
 
 .hero.attack {
@@ -148,14 +130,13 @@ button:active {
 }
 
 .enemy {
-  right: 54px;
+  right: 60px;
 }
 
 .task-panel {
-  flex: 0 0 auto;
   margin-top: 8px;
-  padding: 12px;
-  border-radius: 20px;
+  padding: 11px;
+  border-radius: 18px;
   background: #6b5338;
 }
 
@@ -164,7 +145,7 @@ button:active {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 7px;
 }
 
 .task-title-row strong {
@@ -178,7 +159,7 @@ button:active {
 }
 
 .hp-bar {
-  height: 15px;
+  height: 14px;
   border-radius: 999px;
   overflow: hidden;
   background: #1c1c1c;
@@ -191,24 +172,23 @@ button:active {
 }
 
 #enemyHpText {
-  margin: 6px 0 8px;
+  margin: 5px 0 7px;
   font-size: 12px;
   font-weight: bold;
 }
 
 #log {
   background: rgba(0, 0, 0, 0.32);
-  border-radius: 14px;
-  padding: 9px 10px;
+  border-radius: 13px;
+  padding: 8px 10px;
   font-size: 12px;
   font-weight: bold;
 }
 
 .gather-panel {
-  flex: 0 0 auto;
   margin-top: 8px;
-  padding: 12px;
-  border-radius: 20px;
+  padding: 11px;
+  border-radius: 18px;
   background: #283351;
   text-align: center;
 }
@@ -220,7 +200,7 @@ button:active {
 }
 
 .gather-panel p {
-  margin: 7px 0 0;
+  margin: 6px 0 0;
   font-size: 11px;
   color: #c8d3ff;
 }
@@ -246,7 +226,7 @@ button:active {
 }
 
 .company-icon {
-  font-size: 78px;
+  font-size: 72px;
 }
 
 .row-card {
@@ -261,8 +241,7 @@ button:active {
 }
 
 .bottom-nav {
-  height: 62px;
-  flex: 0 0 62px;
+  height: 58px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   background: #101827;
